@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using LauncherLib.ServerBrowser;
 
 namespace EpochLauncher
 {
@@ -23,6 +24,8 @@ namespace EpochLauncher
         public MainWindow()
         {
             InitializeComponent();
+            var browser = new ServerBrowser();
+            MessageBox.Show(browser.Test);
         }
     }
 }
