@@ -48,10 +48,12 @@ namespace EpochLauncher
 
 		private async void Application_Startup(object sender, StartupEventArgs e)
 		{
+#if !DEBUG
 			using (var manager = new UpdateManager(@"http://dev.bmrf.me/launcher/", "EpochLauncher", FrameworkVersion.Net45))
 			{		
 				await manager.UpdateApp();
 			}
+#endif
 		}
 	}
 }

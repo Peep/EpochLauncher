@@ -24,8 +24,6 @@ namespace EpochLauncher
         public MainWindow()
         {
             InitializeComponent();
-            var browser = new ServerBrowser();
-            MessageBox.Show(browser.Test);
         }
     }
 }
