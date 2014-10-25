@@ -26,16 +26,33 @@ id, version, authors, owners, licenseUrl, projectUrl, iconUrl, requireLicenseAcc
 id.text = "EpochLauncher"
 version.text = sys.argv[1]
 authors.text = owners.text = "Peep"
-licenseUrl.text = ""
-projectUrl.text = ""
 requireLicenseAcceptance.text = "false"
 description.text = "stuff"
 tags.text = "tag"
 
+empty = []
+
 for child in meta:
 	if(child.text is None):
-		meta.remove(child)
+		empty.append(child)
+for e in empty:
+	meta.remove(e)
 
+def indent(elem, level=0):
+    i = "\n" + level*"  "
+    if len(elem):
+        if not elem.text or not elem.text.strip():
+            elem.text = i + "  "
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+        for elem in elem:
+            indent(elem, level+1)
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+    else:
+        if level and (not elem.tail or not elem.tail.strip()):
+            elem.tail = i
 
+indent(root)
 
 tree.write(open(sys.argv[2], "wb"), "utf-8", xml_declaration=True)
