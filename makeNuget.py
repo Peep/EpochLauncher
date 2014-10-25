@@ -31,4 +31,11 @@ projectUrl.text = ""
 requireLicenseAcceptance.text = "false"
 description.text = "stuff"
 tags.text = "tag"
+
+for child in meta:
+	if(child.text is None):
+		meta.remove(child)
+
+
+
 tree.write(open(sys.argv[2], "wb"), "utf-8", xml_declaration=True)
