@@ -31,4 +31,4 @@ projectUrl.text = ""
 requireLicenseAcceptance.text = "false"
 description.text = "stuff"
 tags.text = "tag"
-tree.write(open("EpochLauncher.nuspec", "wb"), "utf-8", xml_declaration=True)
+tree.write(open(sys.argv[2], "wb"), "utf-8", xml_declaration=True)
