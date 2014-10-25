@@ -3,11 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="152*"/>
-            <ColumnDefinition Width="365*"/>
-        </Grid.ColumnDefinitions>
-        <Label FontSize="50px" Grid.ColumnSpan="2">Yay Text</Label>
-
+            <Label FontSize="50px" Grid.ColumnSpan="2">Yay Text</Label>
     </Grid>
 </Window>

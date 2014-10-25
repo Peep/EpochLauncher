@@ -56,7 +56,11 @@ namespace EpochLauncher
 			using (var manager = new UpdateManager(@"http://dev.bmrf.me/launcher/", "EpochLauncher", FrameworkVersion.Net45))
 			{
 				var info = await manager.CheckForUpdate();
-				if (info.FutureReleaseEntry == null) return;
+				if (info.FutureReleaseEntry == null)
+				{
+					MessageBox.Show(info.CurrentlyInstalledVersion.EntryAsString);
+					return;
+				}
 
 				await manager.DownloadReleases(info.ReleasesToApply);
 				await manager.ApplyReleases(info);
