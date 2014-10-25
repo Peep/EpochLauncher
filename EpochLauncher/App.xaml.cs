@@ -52,7 +52,6 @@ namespace EpochLauncher
 
 
 #if !DEBUG
-#else
 			using (var manager = new UpdateManager(@"http://dev.bmrf.me/launcher/", "EpochLauncher", FrameworkVersion.Net45))
 			{
 				var info = await manager.CheckForUpdate();

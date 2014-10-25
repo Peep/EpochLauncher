@@ -24,5 +24,10 @@ namespace EpochLauncher
         {
             InitializeComponent();
         }
+
+	    private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+	    {
+		    WebControl.Source = new Uri("http://www.google.com");
+	    }
     }
 }
