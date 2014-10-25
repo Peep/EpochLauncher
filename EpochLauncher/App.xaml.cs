@@ -48,15 +48,8 @@ namespace EpochLauncher
 
 		private async void Application_Startup(object sender, StartupEventArgs e)
 		{
-			using (var manager = new UpdateManager(@"Releases\", "EpochLauncher", FrameworkVersion.Net45))
-			{
-				SquirrelAwareApp.HandleEvents(
-					onInitialInstall: new Action<Version>(Application_OnInitalInstall),
-					onAppUpdate: new Action<Version>(Application_OnUpdate),
-					onAppObsoleted: new Action<Version>(Application_OnObsolete),
-					onFirstRun: new Action(Application_OnFirstRun),
-					onAppUninstall: new Action<Version>(Application_OnUninstall));
-		
+			using (var manager = new UpdateManager(@"http://dev.bmrf.me/launcher/", "EpochLauncher", FrameworkVersion.Net45))
+			{		
 				await manager.UpdateApp();
 			}
 		}
