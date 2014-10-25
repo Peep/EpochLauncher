@@ -29,6 +29,7 @@ authors.text = owners.text = "Peep"
 requireLicenseAcceptance.text = "false"
 description.text = "stuff"
 tags.text = "tag"
+iconUrl.text = "http://dev.bmrf.me/icon.png"
 
 empty = []
 
