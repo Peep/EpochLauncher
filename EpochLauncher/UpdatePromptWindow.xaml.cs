@@ -1,5 +1,4 @@
 ﻿using System.Windows;
-using System.Windows.Threading;
 
 
 namespace EpochLauncher
@@ -15,7 +14,6 @@ namespace EpochLauncher
         {
             Updater.DoUpdate();
             Close();
-            Application.Current.Dispatcher.BeginInvokeShutdown(DispatcherPriority.Send);
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)

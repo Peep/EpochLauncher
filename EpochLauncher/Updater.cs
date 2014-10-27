@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 using Newtonsoft.Json;
 
 namespace EpochLauncher
@@ -35,8 +33,8 @@ namespace EpochLauncher
             {
                 var window = new UpdatePromptWindow();
                 window.Show();
-                window.Closed += (s, e) => System.Windows.Threading.Dispatcher.ExitAllFrames();
-                System.Windows.Threading.Dispatcher.Run();
+                window.Closed += (s, e) => Dispatcher.ExitAllFrames();
+                Dispatcher.Run();
             });
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
@@ -45,6 +43,7 @@ namespace EpochLauncher
         public static void DoUpdate()
         {
             Process.Start("notepad.exe");
+            Application.Current.Dispatcher.BeginInvokeShutdown(DispatcherPriority.Send);
         }
     }
 }
