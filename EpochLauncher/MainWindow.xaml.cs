@@ -12,7 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Awesomium.Windows.Controls;
+using CefSharp;
+using CefSharp.Wpf;
 
 namespace EpochLauncher
 {
@@ -24,6 +25,15 @@ namespace EpochLauncher
         public MainWindow()
         {
             InitializeComponent();
+
+			var settings = new CefSettings {PackLoadingDisabled = true};
+
+	        if (!Cef.Initialize(settings)) return;
+
+
+	        var webview = new ChromiumWebBrowser();
+	        Browser.Children.Add(webview);
+	        webview.Address = "http://www.google.com";
         }
 
 	    private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)

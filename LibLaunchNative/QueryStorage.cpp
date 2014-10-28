@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "QueryStorage.h"
 #include "Query.h"
 
@@ -6,7 +7,7 @@ QueryStorage::QueryStorage()
 
 }
 
-QueryStorage::QueryStorage()
+QueryStorage::~QueryStorage()
 {
 
 }

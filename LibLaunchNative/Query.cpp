@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Query.h"
 #include "QueryStorage.h"
 
