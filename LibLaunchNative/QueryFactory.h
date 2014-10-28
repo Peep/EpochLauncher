@@ -13,5 +13,5 @@ public:
 	QueryFactory();
 	virtual ~QueryFactory();
 
-	Query* Create(const char* uri);
+	virtual Query* Create(const char* uri) = 0;
 };

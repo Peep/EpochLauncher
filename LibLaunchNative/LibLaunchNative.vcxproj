@@ -80,12 +80,15 @@
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Query.cpp" />
+    <ClCompile Include="QueryStorage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppLauncher.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Query.h" />
     <ClInclude Include="QueryFactory.h" />
+    <ClInclude Include="QueryStorage.h" />
     <ClInclude Include="ServerInfo.h" />
     <ClInclude Include="ServerInfoFactory.h" />
     <ClInclude Include="ServerInfoStorage.h" />

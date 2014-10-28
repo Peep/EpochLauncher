@@ -10,8 +10,6 @@ public:
 	ServerInfoFactory();
 	virtual ~ServerInfoFactory();
 
-	ServerInfo* Create();
-
-protected:
+	virtual ServerInfo* Create() = 0;
 
 };
