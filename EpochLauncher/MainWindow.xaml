@@ -1,8 +1,10 @@
-﻿<Window x:Class="EpochLauncher.MainWindow"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
-            <Label FontSize="50px" Grid.ColumnSpan="2">Yay Text</Label>
-    </Grid>
+        x:Class="EpochLauncher.MainWindow"
+    Title="MainWindow" Height="606" Width="1148"
+    ResizeMode="NoResize"
+    WindowStyle="None"
+    Loaded="MainWindow_OnLoaded">
+    <Grid Name="Browser"></Grid>
 </Window>
