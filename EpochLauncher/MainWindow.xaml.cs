@@ -99,6 +99,10 @@ namespace EpochLauncher
 			        FileAccessFromFileUrlsAllowed = true,
 					WebGlDisabled = true,
 					JavaDisabled = true,	
+                    UniversalAccessFromFileUrlsAllowed = true,
+                    WebSecurityDisabled = false,
+                    PluginsDisabled = true,
+
 		        },
 
 	        };
@@ -107,16 +111,24 @@ namespace EpochLauncher
 	        {
 				WebView.PreviewMouseDown += delegate
 		        {
-					DragMove();
+					//DragMove();
 				};
 	        };
 
 			Browser.Children.Add(WebView);
-			WebView.Address = "cdn.bmrf.me/responsive.html";
-	        Messager = new BoundMessager(this);
+            WebView.LoadError += WebView_LoadError;
+
+            //WebView.RequestHandler = new LocalFileResourceHandler();
+            WebView.Address = "file:///C:/Users/harbingtarbl/Desktop/launcher.html";
+            Messager = new BoundMessager(this);
 			Messager.CloseEvent += MessagerOnCloseEvent;
 			Messager.MinimizeEvent += MessagerMinimizeEvent;
 			Messager.MaximizeEvent += MessagerOnMaximizeEvent;
+        }
+
+        void WebView_LoadError(object sender, LoadErrorEventArgs e)
+        {
+            //MessageBox.Show("Load Error");
         }
 
 
@@ -144,7 +156,7 @@ namespace EpochLauncher
 	    private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
 	    {
 		    WebView.RegisterJsObject("launcher", Messager);
-		    WebView.ShowDevTools();
+		    //WebView.ShowDevTools();
 	    }
     }
 }

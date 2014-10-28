@@ -23,7 +23,7 @@ namespace EpochLauncher
         private static void OnDownloadCompleted(string json)
         {
             var latestVersion = JsonConvert.DeserializeObject<Version>(json);
-            if (latestVersion < App.Version)
+            if (false && latestVersion < App.Version)
                 ShowUpdatePrompt();
         }
 
