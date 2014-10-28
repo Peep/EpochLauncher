@@ -22,6 +22,18 @@ namespace EpochLauncher
     /// </summary>
     public partial class MainWindow : Window
     {
+
+	    public class BoundMessager
+	    {
+		    public void HandleMessage(string type, string json)
+		    {
+			    MessageBox.Show(type, json);
+		    }
+	    }
+
+	    public readonly ChromiumWebBrowser WebView;
+	    public readonly BoundMessager Messager;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -31,13 +43,15 @@ namespace EpochLauncher
 	        if (!Cef.Initialize(settings)) return;
 
 
-	        var webview = new ChromiumWebBrowser();
-	        Browser.Children.Add(webview);
-	        webview.Address = "http://www.google.com";
+			WebView = new ChromiumWebBrowser();
+			Browser.Children.Add(WebView);
+			WebView.Address = "test.html";
+			Messager = new BoundMessager();
         }
 
 	    private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
 	    {
+			WebView.RegisterJsObject("message", Messager);
 		 
 	    }
     }
