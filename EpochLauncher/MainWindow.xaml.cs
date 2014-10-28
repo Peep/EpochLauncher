@@ -105,14 +105,14 @@ namespace EpochLauncher
 
             WebView.Loaded += delegate
             {
-                WebView.PreviewMouseDown += delegate
+                /*WebView.PreviewMouseDown += delegate
                 {
                     DragMove();
-                };
+                };*/
             };
 
             Browser.Children.Add(WebView);
-            WebView.Address = "file:///Z:/web/Epoch/responsive.html";
+            WebView.Address = "http://cdn.bmrf.me/UI.html";
             Messager = new BoundMessager(this);
             Messager.CloseEvent += MessagerOnCloseEvent;
             Messager.MinimizeEvent += MessagerMinimizeEvent;
