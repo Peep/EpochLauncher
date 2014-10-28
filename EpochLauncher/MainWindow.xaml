@@ -5,5 +5,4 @@
         Title="MainWindow" Height="600" Width="800"
     WindowStyle="None"
     Loaded="MainWindow_OnLoaded">   
-    <awe:WebControl Name="WebControl"></awe:WebControl>
 </Window>

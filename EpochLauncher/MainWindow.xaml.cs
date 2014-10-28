@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Awesomium.Windows.Controls;
 
 namespace EpochLauncher
 {
@@ -27,7 +28,7 @@ namespace EpochLauncher
 
 	    private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
 	    {
-		    WebControl.Source = new Uri("http://www.google.com");
+		 
 	    }
     }
 }
