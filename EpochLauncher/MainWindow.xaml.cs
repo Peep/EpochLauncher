@@ -85,8 +85,6 @@ namespace EpochLauncher
 			var settings = new CefSettings
 			{
 				PackLoadingDisabled = false,
-				
-
 			};
 
 	        if (!Cef.Initialize(settings)) return;
@@ -101,29 +99,28 @@ namespace EpochLauncher
 					JavaDisabled = true,	
                     UniversalAccessFromFileUrlsAllowed = true,
                     WebSecurityDisabled = false,
-                    PluginsDisabled = true,
+                    PluginsDisabled = false,
 
 		        },
 
 	        };
 
-	        WebView.Loaded += delegate
-	        {
-				WebView.PreviewMouseDown += delegate
-		        {
-					//DragMove();
-				};
-	        };
-
 			Browser.Children.Add(WebView);
-            WebView.LoadError += WebView_LoadError;
+            //WebView.LoadError += WebView_LoadError;
 
             //WebView.RequestHandler = new LocalFileResourceHandler();
+            WebView.FrameLoadEnd += WebView_FrameLoadEnd;
             WebView.Address = "http://cdn.bmrf.me/UI.html"; //Jamie. Point me at the WebUI folder. 
             Messager = new BoundMessager(this);
 			Messager.CloseEvent += MessagerOnCloseEvent;
 			Messager.MinimizeEvent += MessagerMinimizeEvent;
 			Messager.MaximizeEvent += MessagerOnMaximizeEvent;
+            WebView.RegisterJsObject("launcher", Messager);
+        }
+
+        void WebView_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
+        {
+            Dispatcher.BeginInvoke(new Action(WebView.ShowDevTools));
         }
 
         void WebView_LoadError(object sender, LoadErrorEventArgs e)
@@ -154,9 +151,7 @@ namespace EpochLauncher
 	    }
 
 	    private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
-	    {
-		    WebView.RegisterJsObject("launcher", Messager);
-		    //WebView.ShowDevTools();
+        {
 	    }
     }
 }
