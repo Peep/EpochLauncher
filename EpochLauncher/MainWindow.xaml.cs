@@ -26,6 +26,43 @@ namespace EpochLauncher
     public partial class MainWindow : Window
     {
 
+
+        public class ServerTable
+        {
+            public class ServerTableProxy
+            {
+                public string test;
+
+
+
+                public string TestFunc()
+                {
+                    return test;
+                }
+
+            }
+
+
+            private readonly ServerTableProxy _proxy;
+
+            public ServerTable()
+            {
+                _proxy = new ServerTableProxy();
+
+            }
+
+
+            public void Register(IWebBrowser browser)
+            {
+                browser.RegisterJsObject("servers", _proxy);
+                _proxy.test = "a";
+            }
+
+        }
+        
+
+
+
 	    public class BoundMessager
 	    {
 		    private MainWindow _window;
@@ -79,6 +116,7 @@ namespace EpochLauncher
 
 	    public readonly ChromiumWebBrowser WebView;
         public readonly BoundMessager Messager;
+        public readonly ServerTable Servers;
 
         public MainWindow()
         {
@@ -134,6 +172,9 @@ namespace EpochLauncher
 			Messager.MinimizeEvent += MessagerMinimizeEvent;
 			Messager.MaximizeEvent += MessagerOnMaximizeEvent;
             WebView.RegisterJsObject("launcher", Messager);
+            Servers = new ServerTable();
+            Servers.Register(WebView);
+
             WebView.ShowDevTools();
 
         }
