@@ -15,6 +15,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using CefSharp;
 using CefSharp.Wpf;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace EpochLauncher
 {
@@ -76,15 +78,31 @@ namespace EpochLauncher
 	    }
 
 	    public readonly ChromiumWebBrowser WebView;
-	    public readonly BoundMessager Messager;
+        public readonly BoundMessager Messager;
 
         public MainWindow()
         {
             InitializeComponent();
 
+            WindowSettings jsonSettings;
+            if(File.Exists("window.json"))
+            {
+                jsonSettings = JsonConvert.DeserializeObject<WindowSettings>(File.ReadAllText("window.json"));
+            }
+            else
+            {
+                jsonSettings = new WindowSettings
+                {
+                    width = 1148,
+                    height = 608,
+                    enableComposting = false,
+                    uri = "http://cdn.bmrf.me/UI.html"
+                };
+            }
+
 			var settings = new CefSettings
 			{
-				PackLoadingDisabled = false,
+				PackLoadingDisabled = false
 			};
 
 	        if (!Cef.Initialize(settings)) return;
@@ -100,7 +118,8 @@ namespace EpochLauncher
                     UniversalAccessFromFileUrlsAllowed = true,
                     WebSecurityDisabled = false,
                     PluginsDisabled = false,
-
+                    AcceleratedCompositingDisabled = !jsonSettings.enableComposting,
+                   
 		        },
 
 	        };
@@ -109,13 +128,14 @@ namespace EpochLauncher
             //WebView.LoadError += WebView_LoadError;
 
             //WebView.RequestHandler = new LocalFileResourceHandler();
-            WebView.FrameLoadEnd += WebView_FrameLoadEnd;
             WebView.Address = "http://cdn.bmrf.me/UI.html"; //Jamie. Point me at the WebUI folder. 
             Messager = new BoundMessager(this);
 			Messager.CloseEvent += MessagerOnCloseEvent;
 			Messager.MinimizeEvent += MessagerMinimizeEvent;
 			Messager.MaximizeEvent += MessagerOnMaximizeEvent;
             WebView.RegisterJsObject("launcher", Messager);
+            WebView.ShowDevTools();
+
         }
 
         void WebView_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
