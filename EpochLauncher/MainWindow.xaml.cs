@@ -119,7 +119,7 @@ namespace EpochLauncher
             WebView.LoadError += WebView_LoadError;
 
             //WebView.RequestHandler = new LocalFileResourceHandler();
-            WebView.Address = "file:///C:/Users/harbingtarbl/Desktop/launcher.html";
+            WebView.Address = "http://cdn.bmrf.me/UI.html"; //Jamie. Point me at the WebUI folder. 
             Messager = new BoundMessager(this);
 			Messager.CloseEvent += MessagerOnCloseEvent;
 			Messager.MinimizeEvent += MessagerMinimizeEvent;
