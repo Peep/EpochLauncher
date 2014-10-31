@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -17,7 +18,7 @@ namespace EpochLauncher.View
     /// </summary>
     public partial class LauncherView : Window
     {
-	    private LauncherViewModel _viewModel;
+	    private readonly LauncherViewModel _viewModel;
 
 	    public readonly ChromiumWebBrowser WebView;
 
@@ -25,25 +26,7 @@ namespace EpochLauncher.View
         {
             InitializeComponent();
 
-
-
 			_viewModel = new LauncherViewModel(this);
-
-            WindowSettings jsonSettings;
-            if(File.Exists("window.json"))
-            {
-                jsonSettings = JsonConvert.DeserializeObject<WindowSettings>(File.ReadAllText("window.json"));
-            }
-            else
-            {
-                jsonSettings = new WindowSettings
-                {
-                    width = 1148,
-                    height = 608,
-                    enableComposting = false,
-                    uri = "http://cdn.bmrf.me/UI.html"
-                };
-            }
 
 			var settings = new CefSettings
 			{
@@ -63,32 +46,33 @@ namespace EpochLauncher.View
                     UniversalAccessFromFileUrlsAllowed = true,
                     WebSecurityDisabled = false,
                     PluginsDisabled = false,
-                    AcceleratedCompositingDisabled = !jsonSettings.enableComposting,
+                    AcceleratedCompositingDisabled = !_viewModel.Settings.enableComposting
                    
 		        },
 
+				Width = _viewModel.Settings.width,
+				Height = _viewModel.Settings.height,
+				Address = _viewModel.Settings.uri,
 	        };
 
 			Browser.Children.Add(WebView);
-			WebView.FrameLoadEnd += WebView_FrameLoadEnd;
-            WebView.Address = "http://cdn.bmrf.me/UI.html"; //Jamie. Point me at the WebUI folder. 
-	        WebView.ShowDevTools();
+	        if (_viewModel.Settings.showTools)
+	        {
+		        WebView.ShowDevTools();
+	        }
 			_viewModel.Register(WebView);
 
-
-
-
-
         }
-
-		void WebView_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
-		{
-			
-		}
 
 		private void LauncherView_Loaded(object sender, RoutedEventArgs e)
 		{
  			
 		}
+
+	    private void LauncherView_OnClosing(object sender, CancelEventArgs e)
+	    {
+			_viewModel.OnClosing();
+			_viewModel.Settings.Save("app.json");
+	    }
     }
 }

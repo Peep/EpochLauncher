@@ -5,6 +5,7 @@
     Title="Epoch Launcher" Height="596" Width="1148"
     WindowStyle="None"
     ResizeMode="NoResize"
-    Loaded="LauncherView_Loaded">
+    Loaded="LauncherView_Loaded"
+    Closing="LauncherView_OnClosing">
     <Grid Name="Browser"></Grid>
 </Window>

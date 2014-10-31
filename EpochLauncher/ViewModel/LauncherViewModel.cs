@@ -28,12 +28,13 @@ namespace EpochLauncher.ViewModel
 				_serverStore = serverStore;
 			}
 
+			
 			private List<IServerInfo> _sortedServers;
 			private LauncherView _view;
 			private IGameLauncher _launcher;
 			private FiddlyDiddlyGottaHaveSomeBooty _serverStore;
 
-			private IServerInfo _quickLaunch;
+			public IServerInfo QuickLaunch;
 
 			public void Minimize()
 			{
@@ -52,13 +53,13 @@ namespace EpochLauncher.ViewModel
 
 			public string StartGame()
 			{
-				if (_quickLaunch == null)
+				if (QuickLaunch == null)
 				{
 					Process.Start("arma3.exe", string.Format("-mod=@Epoch -nosplash"));
 					return ResultSuccess;
 				}
 
-				return ManualConnectTo(_quickLaunch.Address, int.Parse(_quickLaunch.Port));
+				return ManualConnectTo(QuickLaunch.Address, int.Parse(QuickLaunch.Port));
 			}
 
 		
@@ -84,15 +85,15 @@ namespace EpochLauncher.ViewModel
 
 			public string GetQuickLaunch()
 			{
-				return _quickLaunch != null ? JsonConvert.SerializeObject(_quickLaunch) : null;
+				return QuickLaunch != null ? JsonConvert.SerializeObject(QuickLaunch) : null;
 			}
 
 			public void SetQuickLaunch(int jsHandle)
 			{
 				if (jsHandle == 0)
-					_quickLaunch = null;
+					QuickLaunch = null;
 				else
-					_quickLaunch = _serverStore.Find(jsHandle);
+					QuickLaunch = _serverStore.Find(jsHandle);
 			}
 
 			public string RequestServers(int min, int max)
@@ -215,10 +216,14 @@ namespace EpochLauncher.ViewModel
 
 
 
+
+
 		private LauncherView _view;
 		private readonly JSAdapter _jsAdapter;
-		private readonly IServerStore _serverStore;
-		private readonly IGameLauncher _launcher;
+
+		public readonly IServerStore ServerStore;
+		public readonly IGameLauncher Launcher;
+		public readonly AppSettings Settings;
 
 		
 
@@ -226,13 +231,20 @@ namespace EpochLauncher.ViewModel
 		public LauncherViewModel(LauncherView view)
 		{
 			_view = view;
-			_serverStore = new FiddlyDiddlyGottaHaveSomeBooty();
-			_jsAdapter = new JSAdapter(null, (FiddlyDiddlyGottaHaveSomeBooty)_serverStore, _view);
+			ServerStore = new FiddlyDiddlyGottaHaveSomeBooty();
+			_jsAdapter = new JSAdapter(null, (FiddlyDiddlyGottaHaveSomeBooty)ServerStore, _view);
+			Settings = AppSettings.GetSettings("app.json");
+			_jsAdapter.QuickLaunch = Settings.quickLaunch;
 		}
 
 		public void Register(IWebBrowser browser)
 		{
 			browser.RegisterJsObject("launcher", _jsAdapter);
+		}
+
+		public void OnClosing()
+		{
+			Settings.quickLaunch = new SeralizedServerInfo(_jsAdapter.QuickLaunch);
 		}
 
 	}
