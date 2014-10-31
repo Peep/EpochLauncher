@@ -25,7 +25,7 @@ namespace Launcher
             var master = MasterQuery.GetMasterServerInstance(EngineType.Source);
             master.GetAddresses(Region.Rest_of_the_world, ReceiveServers, new IpFilter()
             {
-                IsDedicated = true, GameDirectory = "Arma3", GameDataOr = "ttdm"
+                IsDedicated = true, GameDirectory = "Arma3"
             });
         }
 
