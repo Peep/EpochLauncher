@@ -7,7 +7,10 @@ using System.Threading.Tasks;
 namespace Launcher.ViewModels
 {
 	public struct ServerHandleViewModel
-		: IEquatable<ServerViewModel>, IEquatable<int>, IEquatable<ServerHandleViewModel>
+		: 
+		IEquatable<ServerViewModel>, 
+		IEquatable<int>, 
+		IEquatable<ServerHandleViewModel>
 	{
 		public readonly ServerViewModel Server;
 		public readonly int JsHandle;

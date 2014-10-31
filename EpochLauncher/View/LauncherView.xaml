@@ -1,9 +1,10 @@
 ﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        x:Class="EpochLauncher.LauncherView"
+        x:Class="EpochLauncher.View.LauncherView"
     Title="Epoch Launcher" Height="596" Width="1148"
     WindowStyle="None"
-    ResizeMode="NoResize">
+    ResizeMode="NoResize"
+    Loaded="LauncherView_Loaded">
     <Grid Name="Browser"></Grid>
 </Window>
