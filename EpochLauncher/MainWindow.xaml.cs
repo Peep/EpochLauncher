@@ -33,9 +33,11 @@ namespace EpochLauncher
         {
 	        private class ServerData
 	        {
-		        internal readonly uint Id;
+		        public readonly uint Id;
 				public string Ip;
 		        public string Name;
+		        public string MapName;
+		        public float Ping;
 		        public uint Port;
 				public uint MinPlayers;
 				public uint MaxPlayers;
