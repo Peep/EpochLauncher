@@ -4,15 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{02F35EEC-E672-484E-B215-0A5F364CFFD8}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{FC0F9A48-97AC-412C-90CB-6470671577E3}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Launcher</RootNamespace>
-    <AssemblyName>Launcher</AssemblyName>
+    <RootNamespace>Launcher.ConsoleTest</RootNamespace>
+    <AssemblyName>Launcher.ConsoleTest</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,6 +23,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -30,10 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Ionic.BZip2, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>QueryMaster\ExternalBin\Ionic.BZip2.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -43,38 +41,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="QueryMaster\DataObjects.cs" />
-    <Compile Include="QueryMaster\Enums.cs" />
-    <Compile Include="QueryMaster\EventsUtil.cs" />
-    <Compile Include="QueryMaster\Exceptions.cs" />
-    <Compile Include="QueryMaster\GoldSource.cs" />
-    <Compile Include="QueryMaster\IPFilter.cs" />
-    <Compile Include="QueryMaster\LogEventArgs.cs" />
-    <Compile Include="QueryMaster\Logs.cs" />
-    <Compile Include="QueryMaster\MasterQuery.cs" />
-    <Compile Include="QueryMaster\MasterServer.cs" />
-    <Compile Include="QueryMaster\MasterUtil.cs" />
-    <Compile Include="QueryMaster\Parser.cs" />
-    <Compile Include="QueryMaster\QueryMsg.cs" />
-    <Compile Include="QueryMaster\Rcon.cs" />
-    <Compile Include="QueryMaster\RconGoldSource.cs" />
-    <Compile Include="QueryMaster\RconSource.cs" />
-    <Compile Include="QueryMaster\RconSrcPacket.cs" />
-    <Compile Include="QueryMaster\RconUtil.cs" />
-    <Compile Include="QueryMaster\Server.cs" />
-    <Compile Include="QueryMaster\ServerQuery.cs" />
-    <Compile Include="QueryMaster\ServerSocket.cs" />
-    <Compile Include="QueryMaster\Source.cs" />
-    <Compile Include="QueryMaster\TcpQuery.cs" />
-    <Compile Include="QueryMaster\UdpQuery.cs" />
-    <Compile Include="QueryMaster\Util.cs" />
-    <Compile Include="Server.cs" />
-    <Compile Include="ServerBrowser.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewModels\ServerViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="QueryMaster\ExternalBin\Ionic.BZip2.dll" />
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Launcher\Launcher.csproj">
+      <Project>{02f35eec-e672-484e-b215-0a5f364cffd8}</Project>
+      <Name>Launcher</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
