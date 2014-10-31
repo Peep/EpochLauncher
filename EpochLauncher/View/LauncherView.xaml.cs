@@ -9,43 +9,15 @@ using CefSharp.Wpf;
 using Newtonsoft.Json;
 using System.IO;
 
-namespace EpochLauncher
+namespace EpochLauncher.View
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for LauncherView.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class LauncherView : Window
     {
         public class ServerTable
         {
-	        public class ServerData
-	        {
-		        public readonly uint Id;
-				public string Ip;
-		        public string Name;
-		        public string Map;
-		        public float Ping;
-		        public uint Port;
-				public uint MinPlayers;
-				public uint MaxPlayers;
-
-		        internal static uint _nextId = 0;
-
-				public ServerData(string ip, string name, string map, float ping, uint port, uint minPlayers, uint maxPlayers)
-				{
-					Id = ++_nextId;
-			        Ip = ip;
-					Map = map;
-					Ping = ping;
-			        Name = name;
-					Port = port;
-			        MinPlayers = minPlayers;
-					MaxPlayers = maxPlayers;
-				}
-
-	        }
-
-
             public class ServerTableProxy
             {
 	            private readonly ServerTable _table;
@@ -146,7 +118,7 @@ namespace EpochLauncher
 
 	    public class BoundMessager
 	    {
-		    private MainWindow _window;
+		    private LauncherView _window;
 
 		    public class StartGameEventArgs : EventArgs
 		    {
@@ -177,7 +149,7 @@ namespace EpochLauncher
 		    public event LauncherWindowEvent MaximizeEvent;
 
 
-		    public BoundMessager(MainWindow window)
+		    public BoundMessager(LauncherView window)
 		    {
 			    _window = window;
 
@@ -245,7 +217,7 @@ namespace EpochLauncher
         public readonly BoundMessager Messager;
         public readonly ServerTable Servers;
 
-        public MainWindow()
+        public LauncherView()
         {
             InitializeComponent();
 

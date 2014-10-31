@@ -4,14 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EpochLauncher
+namespace Launcher.ViewModels
 {
-	public interface ILauncher
+	public class ServerTableViewModel
 	{
-		StartGameResult StartGame(uint serverId);
-		void Minimize
-
-
+		
 
 
 	}

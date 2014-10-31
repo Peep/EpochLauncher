@@ -43,6 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IGameLauncher.cs" />
+    <Compile Include="Settings\IGameSettings.cs" />
+    <Compile Include="Settings\ILauncherSettings.cs" />
     <Compile Include="QueryMaster\DataObjects.cs" />
     <Compile Include="QueryMaster\Enums.cs" />
     <Compile Include="QueryMaster\EventsUtil.cs" />
@@ -71,6 +74,7 @@
     <Compile Include="Server.cs" />
     <Compile Include="ServerBrowser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings\IServerBrowserSettings.cs" />
     <Compile Include="ViewModels\ServerViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
