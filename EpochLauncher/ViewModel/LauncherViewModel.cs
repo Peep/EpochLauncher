@@ -18,7 +18,7 @@ namespace EpochLauncher.ViewModel
 		{
 			private const string ResultSuccess = @"{""result"":""success""}";
 
-			public JSAdapter(IGameLauncher launcher, IServerStore serverStore, LauncherView view)
+			public JSAdapter(IGameLauncher launcher, FiddlyDiddlyGottaHaveSomeBooty serverStore, LauncherView view)
 			{
 				_view = view;
 				_launcher = launcher;
@@ -28,7 +28,7 @@ namespace EpochLauncher.ViewModel
 			private List<IServerInfo> _sortedServers;
 			private LauncherView _view;
 			private IGameLauncher _launcher;
-			private IServerStore _serverStore;
+			private FiddlyDiddlyGottaHaveSomeBooty _serverStore;
 
 			public void Minimize()
 			{
@@ -62,13 +62,17 @@ namespace EpochLauncher.ViewModel
 
 			public string RequestServers(int min, int max)
 			{
-				max = Math.Min(_sortedServers.Count, max);
+				max = Math.Min(_serverStore.ServerList.Count(), max);
 				min = Math.Max(0, min);
+				var serverList = _serverStore.ServerList.Skip(min).Take(max - min).ToArray();
+				return JsonConvert.SerializeObject(serverList);
 
+
+				
 				var list = new List<IServerInfo>(max - min);
 				for (var i = min; i < max; i++)
 				{
-					list[i - min] = _sortedServers[i];
+					//list[i - min] = serverList[i];
 				}
 				return JsonConvert.SerializeObject(list);
 			}
@@ -129,9 +133,10 @@ namespace EpochLauncher.ViewModel
 
 			private ServerBrowser _bowbow;
 
-			FiddlyDiddlyGottaHaveSomeBooty()
+			public FiddlyDiddlyGottaHaveSomeBooty()
 			{
 				_bowbow = new ServerBrowser();
+				_bowbow.Refresh();
 			}
 
 			public IServerInfo Find(int jsHandle)
@@ -154,6 +159,8 @@ namespace EpochLauncher.ViewModel
 
 		private LauncherView _view;
 		private readonly JSAdapter _jsAdapter;
+		private readonly IServerStore _serverStore;
+		private readonly IGameLauncher _launcher;
 
 		
 
@@ -161,7 +168,8 @@ namespace EpochLauncher.ViewModel
 		public LauncherViewModel(LauncherView view)
 		{
 			_view = view;
-			_jsAdapter = new JSAdapter(null, null, _view);
+			_serverStore = new FiddlyDiddlyGottaHaveSomeBooty();
+			_jsAdapter = new JSAdapter(null, (FiddlyDiddlyGottaHaveSomeBooty)_serverStore, _view);
 		}
 
 		public void Register(IWebBrowser browser)
