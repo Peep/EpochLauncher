@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
-using System.Net.Sockets;
 using Launcher.Events;
 using QueryMaster;
 
@@ -24,9 +23,9 @@ namespace Launcher
                 Servers.Clear();
 
             var master = MasterQuery.GetMasterServerInstance(EngineType.Source);
-            master.GetAddresses(Region.US_East_coast, ReceiveServers, new IpFilter()
+            master.GetAddresses(Region.Rest_of_the_world, ReceiveServers, new IpFilter()
             {
-                IsDedicated = true
+                IsDedicated = true, GameDirectory = "Arma3", GameDataOr = "ttdm"
             });
         }
 
