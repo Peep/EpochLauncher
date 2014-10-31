@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -47,17 +50,38 @@ namespace EpochLauncher.ViewModel
 
 			public string StartGame()
 			{
+				Process.Start("arma3.exe", string.Format("-mod=@Epoch -nosplash -connect={0} -port={1}"));
 				return ResultSuccess;
 			}
 
 			public string ConnectTo(int serverHash)
 			{
-				return ResultSuccess;
+				var server = _serverStore.Find(serverHash);
+				if (server == null)
+				{
+					return @"{""result"":""unknownServer""}";
+				}
+
+
+				return ManualConnectTo(server.Address, int.Parse(server.Port));
 			}
 
 			public string ManualConnectTo(string domain, int port)
 			{
+				domain = Dns.GetHostAddresses(domain).First(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToString();
+
+				Process.Start("arma3.exe", string.Format("-mod=@Epoch -nosplash -connect={0} -port={1}", domain, port));
 				return ResultSuccess;
+			}
+
+			public string GetQuickLaunch()
+			{
+					
+			}
+
+			public void SetQuickLaunch(int jsHandle)
+			{
+				
 			}
 
 			public string RequestServers(int min, int max)
@@ -96,10 +120,15 @@ namespace EpochLauncher.ViewModel
 				: IServerInfo
 			{
 				private ServerInfo _underTheSea;
+				private string _addr;
+				private string _port;
 
 				public BOOTYSWEAT(ServerInfo info)
 				{
 					_underTheSea = info;
+					var split = _addr.Split(new [] {':'});
+					_addr = split[0].Trim();
+					_port = split[1].Trim();
 				}
 
 
@@ -120,12 +149,12 @@ namespace EpochLauncher.ViewModel
 
 				public string Port
 				{
-					get { return "PORT"; }
+					get { return _port; }
 				}
 
 				public string Address
 				{
-					get { return _underTheSea.Address; }
+					get { return _addr; }
 				}
 
 				public string Map
