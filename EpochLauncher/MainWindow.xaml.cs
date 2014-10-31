@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -26,12 +28,158 @@ namespace EpochLauncher
     public partial class MainWindow : Window
     {
 
+
+        public class ServerTable
+        {
+	        public class ServerData
+	        {
+		        public readonly uint Id;
+				public string Ip;
+		        public string Name;
+		        public string Map;
+		        public float Ping;
+		        public uint Port;
+				public uint MinPlayers;
+				public uint MaxPlayers;
+
+		        internal static uint _nextId = 0;
+
+				public ServerData(string ip, string name, string map, float ping, uint port, uint minPlayers, uint maxPlayers)
+				{
+					Id = ++_nextId;
+			        Ip = ip;
+					Map = map;
+					Ping = ping;
+			        Name = name;
+					Port = port;
+			        MinPlayers = minPlayers;
+					MaxPlayers = maxPlayers;
+				}
+
+	        }
+
+
+            public class ServerTableProxy
+            {
+	            private readonly ServerTable _table;
+
+	            public ServerTableProxy(ServerTable table)
+	            {
+		            _table = table;
+	            }
+
+
+	            public string RequestServers(int page)
+	            {
+		            var result = new List<ServerData>();
+		            var touched = new HashSet<uint>();
+
+		            uint data;
+		            while (_table._dirtyServers.TryDequeue(out data))
+		            {
+			            if (touched.Contains(data))
+							continue;
+	
+				          touched.Add(data);
+				          result.Add(_table._servers[data]);
+			            
+		            }
+
+		            return JsonConvert.SerializeObject(result);
+	            }
+
+	            public string RequestFavorites(int page)
+	            {
+		            return JsonConvert.SerializeObject(_table._servers[2]);
+	            }
+
+	            public string RequestHistory(int page)
+	            {
+		            return JsonConvert.SerializeObject(_table._servers[1]);
+	            }
+
+	            public string RequestQuickLaunch()
+	            {
+		            return JsonConvert.SerializeObject(_table._servers[3]);
+	            }
+            }
+
+
+            internal readonly ServerTableProxy _proxy;
+			internal readonly ConcurrentQueue<uint> _dirtyServers;
+			internal readonly Dictionary<uint, ServerData> _servers;
+			internal readonly Task _poker;
+
+
+            public ServerTable()
+            {
+	            _proxy = new ServerTableProxy(this);
+
+	            var servers = new []
+	            {
+		            new ServerData("188.165.250.119", "Some? Server", "A Really Shitty Map", 432.5f, 2364, 50, 50),
+					new ServerData("188.165.233.104", "BMRF Server 1", "A Really Great Map", 32.0f, 2502, 0, 50),
+					new ServerData("188.165.250.119", "BMRF Server 2", "Crytek Sponza", 80.5f, 2602, 25, 50),
+	            };
+
+	            _servers = new Dictionary<uint, ServerData>();
+				_dirtyServers = new ConcurrentQueue<uint>();
+	            foreach (var s in servers)
+	            {
+		            _servers[s.Id] = s;
+					_dirtyServers.Enqueue(s.Id);
+	            }
+
+	            _poker = new Task(() =>
+	            {
+		            while (!_poker.IsCanceled)
+		            {
+			            _dirtyServers.Enqueue((uint) new Random().Next(1, (int) ServerData._nextId + 1));
+						Thread.Sleep(500);
+		            }
+	            });
+
+				_poker.Start();
+            }
+
+
+            public void Register(IWebBrowser browser)
+            {
+                browser.RegisterJsObject("servers", _proxy);
+            }
+        }
+        
+
+
+
 	    public class BoundMessager
 	    {
 		    private MainWindow _window;
 
+		    public class StartGameEventArgs : EventArgs
+		    {
+			    public readonly bool ConnectTo;
+			    public readonly string ServerIP;
+			    public readonly uint ServerPort;
+
+			    public StartGameEventArgs(string serverIp, uint serverPort)
+			    {
+				    if (serverIp == "" && serverPort == 0)
+					    ConnectTo = false;
+				    else
+				    {
+					    ServerIP = serverIp;
+					    ServerPort = serverPort;
+				    }
+			    }
+		    }
+
 		    public delegate void LauncherWindowEvent();
 
+		    public delegate void LauncherStartGameEvent(BoundMessager sender, StartGameEventArgs args);
+
+
+		    public event LauncherStartGameEvent StartGameEvent;
 		    public event LauncherWindowEvent CloseEvent;
 		    public event LauncherWindowEvent MinimizeEvent;
 		    public event LauncherWindowEvent MaximizeEvent;
@@ -43,6 +191,30 @@ namespace EpochLauncher
 
 		    }
 
+
+		    public string StartGame(int id)
+		    {
+			    var tmp = StartGameEvent;
+			    if (tmp != null)
+			    {
+				    var serverIP = "";
+				    uint port = 0;
+
+				    if (id != 0)
+				    {
+					    if (!_window.Servers._servers.ContainsKey((uint) id))
+					    {
+							return @"{""result"":""unknown server""}";
+					    }
+
+					    serverIP = _window.Servers._servers[(uint)id].Ip;
+					    port = _window.Servers._servers[(uint) id].Port;
+				    }
+				    tmp(this, new StartGameEventArgs(serverIP, port));
+			    }
+
+			    return @"{""result"":""success""}";
+		    }
 
 		    public void HandleMessage(string type, string json)
 		    {
@@ -79,6 +251,7 @@ namespace EpochLauncher
 
 	    public readonly ChromiumWebBrowser WebView;
         public readonly BoundMessager Messager;
+        public readonly ServerTable Servers;
 
         public MainWindow()
         {
@@ -125,29 +298,19 @@ namespace EpochLauncher
 	        };
 
 			Browser.Children.Add(WebView);
-            //WebView.LoadError += WebView_LoadError;
 
-            //WebView.RequestHandler = new LocalFileResourceHandler();
             WebView.Address = "http://cdn.bmrf.me/UI.html"; //Jamie. Point me at the WebUI folder. 
             Messager = new BoundMessager(this);
 			Messager.CloseEvent += MessagerOnCloseEvent;
 			Messager.MinimizeEvent += MessagerMinimizeEvent;
 			Messager.MaximizeEvent += MessagerOnMaximizeEvent;
             WebView.RegisterJsObject("launcher", Messager);
+            Servers = new ServerTable();
+            Servers.Register(WebView);
+
             WebView.ShowDevTools();
 
         }
-
-        void WebView_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
-        {
-            Dispatcher.BeginInvoke(new Action(WebView.ShowDevTools));
-        }
-
-        void WebView_LoadError(object sender, LoadErrorEventArgs e)
-        {
-            //MessageBox.Show("Load Error");
-        }
-
 
 	    private void MessagerOnMaximizeEvent()
 	    {
