@@ -202,6 +202,11 @@ namespace EpochLauncher
 
 				    if (id != 0)
 				    {
+					    if (!_window.Servers._servers.ContainsKey((uint) id))
+					    {
+							return @"{""result"":""unknown server""}";
+					    }
+
 					    serverIP = _window.Servers._servers[(uint)id].Ip;
 					    port = _window.Servers._servers[(uint) id].Port;
 				    }
