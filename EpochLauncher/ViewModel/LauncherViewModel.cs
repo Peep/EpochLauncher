@@ -85,8 +85,77 @@ namespace EpochLauncher.ViewModel
 			}
 		}
 
+		private class FiddlyDiddlyGottaHaveSomeBooty
+			: IServerStore
+		{
+			public class BOOTYSWEAT
+				: IServerInfo
+			{
+				private ServerInfo _underTheSea;
+
+				public BOOTYSWEAT(ServerInfo info)
+				{
+					_underTheSea = info;
+				}
+
+
+				public string Name
+				{
+					get { return _underTheSea.Name; }
+				}
+
+				public int CurrentPlayers
+				{
+					get { return _underTheSea.Players; }
+				}
+
+				public int MaxPlayers
+				{
+					get { return _underTheSea.MaxPlayers; }
+				}
+
+				public string Port
+				{
+					get { return "PORT"; }
+				}
+
+				public string Address
+				{
+					get { return _underTheSea.Address; }
+				}
+
+				public int Handle { get { return _underTheSea.Address.GetHashCode(); }}
+			}
+
+			private ServerBrowser _bowbow;
+
+			FiddlyDiddlyGottaHaveSomeBooty()
+			{
+				_bowbow = new ServerBrowser();
+			}
+
+			public IServerInfo Find(int jsHandle)
+			{
+				ServerInfo data;
+				if (_bowbow.Servers.TryGetValue(jsHandle, out data))
+				{
+					return new BOOTYSWEAT(data);
+				}
+				return null;
+			}
+
+			public IEnumerable<IServerInfo> ServerList
+			{
+				get { return _bowbow.Servers.Values.Select(x => new BOOTYSWEAT(x)); }
+			}
+		}
+
+
+
 		private LauncherView _view;
 		private readonly JSAdapter _jsAdapter;
+
+		
 
 
 		public LauncherViewModel(LauncherView view)
