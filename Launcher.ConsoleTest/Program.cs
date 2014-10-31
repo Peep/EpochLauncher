@@ -9,6 +9,15 @@ namespace Launcher.ConsoleTest
     {
         static void Main()
         {
+            var browser = new ServerBrowser();
+            while (true)
+            {
+                foreach (var server in browser.Servers)
+                {
+                    Console.WriteLine(server.Hostname);
+                }
+                Thread.Sleep(1000);
+            }
         }
     }
 }
