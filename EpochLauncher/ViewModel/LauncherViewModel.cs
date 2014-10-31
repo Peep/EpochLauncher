@@ -137,9 +137,17 @@ namespace EpochLauncher.ViewModel
 				public BOOTYSWEAT(ServerInfo info)
 				{
 					_underTheSea = info;
-					var split = _addr.Split(new [] {':'});
-					_addr = split[0].Trim();
-					_port = split[1].Trim();
+					var split = info.Address.Split(new [] {':'});
+					if (split.Length != 2)
+					{
+						_addr = "0.0.0.0";
+						_port = "0000";
+					}
+					else
+					{
+						_addr = split[0].Trim();
+						_port = split[1].Trim();
+					}
 				}
 
 
