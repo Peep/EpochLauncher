@@ -33,6 +33,8 @@ namespace EpochLauncher.ViewModel
 			private IGameLauncher _launcher;
 			private FiddlyDiddlyGottaHaveSomeBooty _serverStore;
 
+			private IServerInfo _quickLaunch;
+
 			public void Minimize()
 			{
 				_view.Dispatcher.InvokeAsync(() => _view.WindowState = WindowState.Minimized);
@@ -50,10 +52,16 @@ namespace EpochLauncher.ViewModel
 
 			public string StartGame()
 			{
-				Process.Start("arma3.exe", string.Format("-mod=@Epoch -nosplash -connect={0} -port={1}"));
-				return ResultSuccess;
+				if (_quickLaunch == null)
+				{
+					Process.Start("arma3.exe", string.Format("-mod=@Epoch -nosplash"));
+					return ResultSuccess;
+				}
+
+				return ManualConnectTo(_quickLaunch.Address, int.Parse(_quickLaunch.Port));
 			}
 
+		
 			public string ConnectTo(int serverHash)
 			{
 				var server = _serverStore.Find(serverHash);
@@ -76,12 +84,15 @@ namespace EpochLauncher.ViewModel
 
 			public string GetQuickLaunch()
 			{
-					
+				return _quickLaunch != null ? JsonConvert.SerializeObject(_quickLaunch) : null;
 			}
 
 			public void SetQuickLaunch(int jsHandle)
 			{
-				
+				if (jsHandle == 0)
+					_quickLaunch = null;
+				else
+					_quickLaunch = _serverStore.Find(jsHandle);
 			}
 
 			public string RequestServers(int min, int max)
