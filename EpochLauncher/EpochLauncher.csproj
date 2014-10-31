@@ -125,16 +125,13 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppSettings.cs" />
-    <Compile Include="ILauncher.cs" />
-    <Compile Include="LauncherAdapter.cs" />
     <Compile Include="LocalFileResourceHandler.cs" />
-    <Compile Include="StartGameResult.cs" />
     <Compile Include="UpdatePromptWindow.xaml.cs">
       <DependentUpon>UpdatePromptWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Updater.cs" />
     <Compile Include="Version.cs" />
-    <Page Include="MainWindow.xaml">
+    <Page Include="View\LauncherView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -142,8 +139,9 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
+    <Compile Include="ViewModel\LauncherViewModel.cs" />
+    <Compile Include="View\LauncherView.xaml.cs">
+      <DependentUpon>LauncherView.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Page Include="UpdatePromptWindow.xaml">
@@ -198,7 +196,15 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Launcher\Launcher.csproj">
+      <Project>{02f35eec-e672-484e-b215-0a5f364cffd8}</Project>
+      <Name>Launcher</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Model\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\cef.redist.3.1750.1738\build\cef.redist.targets" Condition="Exists('..\packages\cef.redist.3.1750.1738\build\cef.redist.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
