@@ -33,6 +33,7 @@ namespace EpochLauncher.ViewModel
 			private LauncherView _view;
 			private IGameLauncher _launcher;
 			private FiddlyDiddlyGottaHaveSomeBooty _serverStore;
+			public AppSettings _weee;
 
 			public IServerInfo QuickLaunch;
 
@@ -79,7 +80,7 @@ namespace EpochLauncher.ViewModel
 			{
 				domain = Dns.GetHostAddresses(domain).First(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToString();
 
-				Process.Start("arma3.exe", string.Format("-mod=@Epoch -nosplash -connect={0} -port={1}", domain, port));
+				Process.Start(_weee.gamePath,_ string.Format("-mod=@Epoch -nosplash -connect={0} -port={1}", domain, port));
 				return ResultSuccess;
 			}
 
@@ -233,7 +234,9 @@ namespace EpochLauncher.ViewModel
 			_view = view;
 			ServerStore = new FiddlyDiddlyGottaHaveSomeBooty();
 			_jsAdapter = new JSAdapter(null, (FiddlyDiddlyGottaHaveSomeBooty)ServerStore, _view);
+
 			Settings = AppSettings.GetSettings("app.json");
+			_jsAdapter._weee = Settings;
 			_jsAdapter.QuickLaunch = Settings.quickLaunch;
 		}
 
