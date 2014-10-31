@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -29,35 +31,108 @@ namespace EpochLauncher
 
         public class ServerTable
         {
+	        private class ServerData
+	        {
+		        internal readonly uint Id;
+				public string Ip;
+		        public string Name;
+		        public uint Port;
+				public uint MinPlayers;
+				public uint MaxPlayers;
+
+		        internal static uint _nextId = 0;
+
+				public ServerData(string ip, string name, uint port, uint minPlayers, uint maxPlayers)
+				{
+					Id = ++_nextId;
+			        Ip = ip;
+			        Name = name;
+					Port = port;
+			        MinPlayers = minPlayers;
+					MaxPlayers = maxPlayers;
+				}
+
+	        }
+
+
             public class ServerTableProxy
             {
-                public string test;
+	            private readonly ServerTable _table;
 
 
+	            public ServerTableProxy(ServerTable table)
+	            {
+		            _table = table;
+	            }
 
-                public string TestFunc()
-                {
-                    return test;
-                }
 
+	            public string RequestNeedUpdates(int count)
+	            {
+		            var result = new List<ServerData>();
+		            var touched = new HashSet<uint>();
+
+		            uint data;
+		            while (count > 0 && _table._dirtyServers.TryDequeue(out data))
+		            {
+			            if (touched.Contains(data))
+							continue;
+	
+				          touched.Add(data);
+				          result.Add(_table._servers[data]);
+			            
+		            }
+
+		            return JsonConvert.SerializeObject(result);
+	            }
             }
 
 
             private readonly ServerTableProxy _proxy;
+	        private readonly ConcurrentQueue<uint> _dirtyServers;
+			private readonly Dictionary<uint, ServerData> _servers;
+	        private readonly Task _poker;
+
 
             public ServerTable()
             {
-                _proxy = new ServerTableProxy();
+	            _proxy = new ServerTableProxy(this);
 
+	            var servers = new []
+	            {
+		            new ServerData("188.165.250.119", "Some? Server", 2364, 50, 50),
+					new ServerData("188.165.233.104", "BMRF Server 1", 2502, 0, 50),
+					new ServerData("188.165.250.119", "BMRF Server 2", 2602, 25, 50),
+	            };
+
+	            _servers = new Dictionary<uint, ServerData>();
+				_dirtyServers = new ConcurrentQueue<uint>();
+	            foreach (var s in servers)
+	            {
+		            _servers[s.Id] = s;
+					_dirtyServers.Enqueue(s.Id);
+	            }
+
+	            _poker = new Task(() =>
+	            {
+		            while (!_poker.IsCanceled)
+		            {
+			            _dirtyServers.Enqueue((uint) new Random().Next(1, (int) ServerData._nextId + 1));
+						Thread.Sleep(500);
+		            }
+	            });
+
+				_poker.Start();
             }
 
 
             public void Register(IWebBrowser browser)
             {
                 browser.RegisterJsObject("servers", _proxy);
-                _proxy.test = "a";
             }
 
+
+
+	       
         }
         
 
@@ -163,9 +238,7 @@ namespace EpochLauncher
 	        };
 
 			Browser.Children.Add(WebView);
-            //WebView.LoadError += WebView_LoadError;
 
-            //WebView.RequestHandler = new LocalFileResourceHandler();
             WebView.Address = "http://cdn.bmrf.me/UI.html"; //Jamie. Point me at the WebUI folder. 
             Messager = new BoundMessager(this);
 			Messager.CloseEvent += MessagerOnCloseEvent;
@@ -178,17 +251,6 @@ namespace EpochLauncher
             WebView.ShowDevTools();
 
         }
-
-        void WebView_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
-        {
-            Dispatcher.BeginInvoke(new Action(WebView.ShowDevTools));
-        }
-
-        void WebView_LoadError(object sender, LoadErrorEventArgs e)
-        {
-            //MessageBox.Show("Load Error");
-        }
-
 
 	    private void MessagerOnMaximizeEvent()
 	    {
