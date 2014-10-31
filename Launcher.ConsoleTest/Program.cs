@@ -14,7 +14,7 @@ namespace Launcher.ConsoleTest
             {
                 foreach (var server in browser.Servers)
                 {
-                    Console.WriteLine(server.Hostname);
+                    Console.WriteLine(server.Name);
                 }
                 Thread.Sleep(1000);
             }

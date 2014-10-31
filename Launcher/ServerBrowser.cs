@@ -1,29 +1,40 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using Launcher.ViewModels;
+using Launcher.Events;
 using QueryMaster;
 
 namespace Launcher
 {
     public class ServerBrowser
     {
-        public List<ServerViewModel> Servers { get; internal set; } 
-        private MasterServer _master;
+        public Dictionary<int, ServerInfo> Servers { get; internal set; }
 
-        public ServerBrowser()
+        public event EventHandler<ServerEventArgs> ServerAdded;
+        public event EventHandler<ServerEventArgs> ServerChanged;
+
+        public void Refresh()
         {
-            Servers = new List<ServerViewModel>();
-            _master = MasterQuery.GetMasterServerInstance(EngineType.Source);
-            _master.GetAddresses(Region.US_East_coast, ReceiveServers, new IpFilter()
+            if (Servers == null)
+                Servers = new Dictionary<int, ServerInfo>();
+            else
+                Servers.Clear();
+
+            var master = MasterQuery.GetMasterServerInstance(EngineType.Source);
+            master.GetAddresses(Region.US_East_coast, ReceiveServers, new IpFilter()
             {
                 IsDedicated = true
             });
+        }
+
+        public void Refresh(int serverHandle)
+        {
+            if (!Servers.ContainsKey(serverHandle)) return;
+
+            var address = Servers[serverHandle].Address.Split(':');
+            QueryServer(new IPEndPoint(IPAddress.Parse(address[0]), Convert.ToInt32(address[1])));
         }
 
         void ReceiveServers(ReadOnlyCollection<IPEndPoint> endPoints)
@@ -36,12 +47,34 @@ namespace Launcher
         {
             var server = ServerQuery.GetServerInstance(EngineType.Source, endPoint);
             var info = server.GetInfo();
-            Servers.Add(new ServerViewModel
+            var handle = info.Address.GetHashCode();
+
+            if (Servers.ContainsKey(handle))
             {
-                CurrentPlayers = info.Players, Game = info.ServerType, Hostname = info.Name,
-                IpAddress = info.Address, Map = info.Map, MaxPlayers = info.MaxPlayers, Mods = "fuck",
-                Ping = (int)info.Ping, Port = 0
-            });
+                Servers[handle] = info;
+                var args = new ServerEventArgs {Handle = handle};
+                OnServerChanged(args);
+            }
+            else
+            {
+                Servers.Add(handle, info);
+                var args = new ServerEventArgs {Handle = handle};
+                OnServerAdded(args);
+            }
+        }
+
+        protected virtual void OnServerAdded(ServerEventArgs e)
+        {
+            var handler = ServerAdded;
+            if (handler != null)
+                handler(this, e);
+        }
+
+        protected virtual void OnServerChanged(ServerEventArgs e)
+        {
+            var handler = ServerChanged;
+            if (handler != null)
+                handler(this, e);
         }
     }
 }
