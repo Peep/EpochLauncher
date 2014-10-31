@@ -15,7 +15,7 @@ namespace Launcher
 
         public ServerBrowser()
         {
-           _masterServer = new MasterServer();
+			_masterServer = new MasterServer("hl2master.steampowered.com");
         }
     }
 }

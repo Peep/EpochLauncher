@@ -31,12 +31,12 @@ namespace EpochLauncher
 
         public class ServerTable
         {
-	        private class ServerData
+	        public class ServerData
 	        {
 		        public readonly uint Id;
 				public string Ip;
 		        public string Name;
-		        public string MapName;
+		        public string Map;
 		        public float Ping;
 		        public uint Port;
 				public uint MinPlayers;
@@ -44,10 +44,12 @@ namespace EpochLauncher
 
 		        internal static uint _nextId = 0;
 
-				public ServerData(string ip, string name, uint port, uint minPlayers, uint maxPlayers)
+				public ServerData(string ip, string name, string map, float ping, uint port, uint minPlayers, uint maxPlayers)
 				{
 					Id = ++_nextId;
 			        Ip = ip;
+					Map = map;
+					Ping = ping;
 			        Name = name;
 					Port = port;
 			        MinPlayers = minPlayers;
@@ -61,20 +63,19 @@ namespace EpochLauncher
             {
 	            private readonly ServerTable _table;
 
-
 	            public ServerTableProxy(ServerTable table)
 	            {
 		            _table = table;
 	            }
 
 
-	            public string RequestNeedUpdates(int count)
+	            public string RequestServers(int page)
 	            {
 		            var result = new List<ServerData>();
 		            var touched = new HashSet<uint>();
 
 		            uint data;
-		            while (count > 0 && _table._dirtyServers.TryDequeue(out data))
+		            while (_table._dirtyServers.TryDequeue(out data))
 		            {
 			            if (touched.Contains(data))
 							continue;
@@ -86,13 +87,28 @@ namespace EpochLauncher
 
 		            return JsonConvert.SerializeObject(result);
 	            }
+
+	            public string RequestFavorites(int page)
+	            {
+		            return JsonConvert.SerializeObject(_table._servers[2]);
+	            }
+
+	            public string RequestHistory(int page)
+	            {
+		            return JsonConvert.SerializeObject(_table._servers[1]);
+	            }
+
+	            public string RequestQuickLaunch()
+	            {
+		            return JsonConvert.SerializeObject(_table._servers[3]);
+	            }
             }
 
 
-            private readonly ServerTableProxy _proxy;
-	        private readonly ConcurrentQueue<uint> _dirtyServers;
-			private readonly Dictionary<uint, ServerData> _servers;
-	        private readonly Task _poker;
+            internal readonly ServerTableProxy _proxy;
+			internal readonly ConcurrentQueue<uint> _dirtyServers;
+			internal readonly Dictionary<uint, ServerData> _servers;
+			internal readonly Task _poker;
 
 
             public ServerTable()
@@ -101,9 +117,9 @@ namespace EpochLauncher
 
 	            var servers = new []
 	            {
-		            new ServerData("188.165.250.119", "Some? Server", 2364, 50, 50),
-					new ServerData("188.165.233.104", "BMRF Server 1", 2502, 0, 50),
-					new ServerData("188.165.250.119", "BMRF Server 2", 2602, 25, 50),
+		            new ServerData("188.165.250.119", "Some? Server", "A Really Shitty Map", 432.5f, 2364, 50, 50),
+					new ServerData("188.165.233.104", "BMRF Server 1", "A Really Great Map", 32.0f, 2502, 0, 50),
+					new ServerData("188.165.250.119", "BMRF Server 2", "Crytek Sponza", 80.5f, 2602, 25, 50),
 	            };
 
 	            _servers = new Dictionary<uint, ServerData>();
@@ -131,10 +147,6 @@ namespace EpochLauncher
             {
                 browser.RegisterJsObject("servers", _proxy);
             }
-
-
-
-	       
         }
         
 
@@ -144,8 +156,30 @@ namespace EpochLauncher
 	    {
 		    private MainWindow _window;
 
+		    public class StartGameEventArgs : EventArgs
+		    {
+			    public readonly bool ConnectTo;
+			    public readonly string ServerIP;
+			    public readonly uint ServerPort;
+
+			    public StartGameEventArgs(string serverIp, uint serverPort)
+			    {
+				    if (serverIp == "" && serverPort == 0)
+					    ConnectTo = false;
+				    else
+				    {
+					    ServerIP = serverIp;
+					    ServerPort = serverPort;
+				    }
+			    }
+		    }
+
 		    public delegate void LauncherWindowEvent();
 
+		    public delegate void LauncherStartGameEvent(BoundMessager sender, StartGameEventArgs args);
+
+
+		    public event LauncherStartGameEvent StartGameEvent;
 		    public event LauncherWindowEvent CloseEvent;
 		    public event LauncherWindowEvent MinimizeEvent;
 		    public event LauncherWindowEvent MaximizeEvent;
@@ -157,6 +191,25 @@ namespace EpochLauncher
 
 		    }
 
+
+		    public string StartGame(int id)
+		    {
+			    var tmp = StartGameEvent;
+			    if (tmp != null)
+			    {
+				    var serverIP = "";
+				    uint port = 0;
+
+				    if (id != 0)
+				    {
+					    serverIP = _window.Servers._servers[(uint)id].Ip;
+					    port = _window.Servers._servers[(uint) id].Port;
+				    }
+				    tmp(this, new StartGameEventArgs(serverIP, port));
+			    }
+
+			    return @"{""result"":""success""}";
+		    }
 
 		    public void HandleMessage(string type, string json)
 		    {
