@@ -1,26 +1,28 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using Launcher.ViewModels;
+using Launcher.Events;
 using QueryMaster;
 
 namespace Launcher
 {
     public class ServerBrowser
     {
-        public List<ServerInfo> Servers { get; internal set; } 
-        private MasterServer _master;
+        public Dictionary<int, ServerInfo> Servers { get; internal set; }
 
-        public ServerBrowser()
+        public event EventHandler<ServerAddedEventArgs> ServerAdded;
+
+        public void Refresh()
         {
-            Servers = new List<ServerInfo>();
-            _master = MasterQuery.GetMasterServerInstance(EngineType.Source);
-            _master.GetAddresses(Region.US_East_coast, ReceiveServers, new IpFilter()
+            if (Servers == null)
+                Servers = new Dictionary<int, ServerInfo>();
+            else
+                Servers.Clear();
+
+            var master = MasterQuery.GetMasterServerInstance(EngineType.Source);
+            master.GetAddresses(Region.US_East_coast, ReceiveServers, new IpFilter()
             {
                 IsDedicated = true
             });
@@ -36,7 +38,9 @@ namespace Launcher
         {
             var server = ServerQuery.GetServerInstance(EngineType.Source, endPoint);
             var info = server.GetInfo();
-            Servers.Add(info);
+
+            var hash = info.GetHashCode();
+            Servers.Add(hash, info);
         }
     }
 }

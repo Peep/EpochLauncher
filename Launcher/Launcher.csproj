@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Events\ServerAddedEventArgs.cs" />
     <Compile Include="Launchers\IGameLauncher.cs" />
     <Compile Include="Settings\IGameSettings.cs" />
     <Compile Include="Settings\ILauncherSettings.cs" />
@@ -76,7 +77,6 @@
     <Compile Include="Settings\IServerBrowserSettings.cs" />
     <Compile Include="ViewModels\ServerHandleViewModel.cs" />
     <Compile Include="ViewModels\ServerTableViewModel.cs" />
-    <Compile Include="ViewModels\ServerViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="QueryMaster\ExternalBin\Ionic.BZip2.dll" />
