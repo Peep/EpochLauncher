@@ -77,11 +77,12 @@
     <Compile Include="ServerBrowser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings\IServerBrowserSettings.cs" />
-    <Compile Include="ViewModels\ServerHandleViewModel.cs" />
-    <Compile Include="ViewModels\ServerTableViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="QueryMaster\ExternalBin\Ionic.BZip2.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ViewModels\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using CefSharp;
 using CefSharp.Wpf;
+using EpochLauncher.ViewModel;
 using Newtonsoft.Json;
 using System.IO;
 
@@ -16,12 +17,17 @@ namespace EpochLauncher.View
     /// </summary>
     public partial class LauncherView : Window
     {
+	    private LauncherViewModel _viewModel;
 
 	    public readonly ChromiumWebBrowser WebView;
 
         public LauncherView()
         {
             InitializeComponent();
+
+
+
+			_viewModel = new LauncherViewModel(this);
 
             WindowSettings jsonSettings;
             if(File.Exists("window.json"))
@@ -64,12 +70,21 @@ namespace EpochLauncher.View
 	        };
 
 			Browser.Children.Add(WebView);
+			WebView.FrameLoadEnd += WebView_FrameLoadEnd;
             WebView.Address = "http://cdn.bmrf.me/UI.html"; //Jamie. Point me at the WebUI folder. 
 	        WebView.ShowDevTools();
+			_viewModel.Register(WebView);
+
+
 
 
 
         }
+
+		void WebView_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
+		{
+			
+		}
 
 		private void LauncherView_Loaded(object sender, RoutedEventArgs e)
 		{

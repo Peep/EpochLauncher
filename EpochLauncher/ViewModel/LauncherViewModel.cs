@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using CefSharp;
 using EpochLauncher.View;
 using Launcher;
 using Newtonsoft.Json;
@@ -17,29 +18,34 @@ namespace EpochLauncher.ViewModel
 		{
 			private const string ResultSuccess = @"{""result"":""success""}";
 
-			private List<IServerInfo> _sortedServers;  
+			public JSAdapter(IGameLauncher launcher, IServerStore serverStore, LauncherView view)
+			{
+				_view = view;
+				_launcher = launcher;
+				_serverStore = serverStore;
+			}
 
-			public LauncherView View { get; set; }
-			public IGameLauncher Launcher { get; set; }
-			public IServerStore ServerStore { get; set; }
-
+			private List<IServerInfo> _sortedServers;
+			private LauncherView _view;
+			private IGameLauncher _launcher;
+			private IServerStore _serverStore;
 
 			public void Minimize()
 			{
-				View.Dispatcher.InvokeAsync(() => View.WindowState = WindowState.Minimized);
+				_view.Dispatcher.InvokeAsync(() => _view.WindowState = WindowState.Minimized);
 			}
 
 			public void Maximize()
 			{
-				View.Dispatcher.InvokeAsync(() => View.WindowState = WindowState.Maximized);
+				_view.Dispatcher.InvokeAsync(() => _view.WindowState = WindowState.Maximized);
 			}
 
 			public void Close()
 			{
-				View.Dispatcher.InvokeAsync(View.Close);
+				_view.Dispatcher.InvokeAsync(_view.Close);
 			}
 
-			public string Start()
+			public string StartGame()
 			{
 				return ResultSuccess;
 			}
@@ -69,10 +75,10 @@ namespace EpochLauncher.ViewModel
 
 			public string RequestServer(int jsHandle)
 			{
-				var result = ServerStore.Find(jsHandle);
+				var result = _serverStore.Find(jsHandle);
 				if (result == null)
 				{
-					return JsonConvert.SerializeObject(null);
+					return null;
 				}
 
 				return JsonConvert.SerializeObject(result);
@@ -80,25 +86,18 @@ namespace EpochLauncher.ViewModel
 		}
 
 		private LauncherView _view;
-		private JSAdapter _jsAdapter;
+		private readonly JSAdapter _jsAdapter;
 
 
 		public LauncherViewModel(LauncherView view)
 		{
 			_view = view;
-			_jsAdapter = new JSAdapter
-			{
-				Launcher = null,
-				ServerStore = null,
-				View = _view
-			};
-
-			_view.Loaded += view_Loaded;
+			_jsAdapter = new JSAdapter(null, null, _view);
 		}
 
-		void view_Loaded(object sender, RoutedEventArgs e)
+		public void Register(IWebBrowser browser)
 		{
-			_view.WebView.RegisterJsObject("launcher", _jsAdapter);
+			browser.RegisterJsObject("launcher", _jsAdapter);
 		}
 
 	}
