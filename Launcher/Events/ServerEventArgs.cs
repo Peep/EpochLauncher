@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Launcher.Events
 {
-    public class ServerAddedEventArgs
+    public class ServerEventArgs
     {
+        public int Handle { get; internal set; }
     }
 }

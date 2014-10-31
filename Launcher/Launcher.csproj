@@ -43,7 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Events\ServerAddedEventArgs.cs" />
+    <Compile Include="Events\ServerEventArgs.cs" />
     <Compile Include="Launchers\IGameLauncher.cs" />
     <Compile Include="Settings\IGameSettings.cs" />
     <Compile Include="Settings\ILauncherSettings.cs" />

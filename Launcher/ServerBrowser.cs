@@ -12,7 +12,8 @@ namespace Launcher
     {
         public Dictionary<int, ServerInfo> Servers { get; internal set; }
 
-        public event EventHandler<ServerAddedEventArgs> ServerAdded;
+        public event EventHandler<ServerEventArgs> ServerAdded;
+        public event EventHandler<ServerEventArgs> ServerChanged;
 
         public void Refresh()
         {
@@ -51,13 +52,29 @@ namespace Launcher
             if (Servers.ContainsKey(handle))
             {
                 Servers[handle] = info;
-                // Call object modified event
+                var args = new ServerEventArgs {Handle = handle};
+                OnServerChanged(args);
             }
             else
             {
                 Servers.Add(handle, info);
-                // Call object added event
+                var args = new ServerEventArgs {Handle = handle};
+                OnServerAdded(args);
             }
+        }
+
+        protected virtual void OnServerAdded(ServerEventArgs e)
+        {
+            var handler = ServerAdded;
+            if (handler != null)
+                handler(this, e);
+        }
+
+        protected virtual void OnServerChanged(ServerEventArgs e)
+        {
+            var handler = ServerChanged;
+            if (handler != null)
+                handler(this, e);
         }
     }
 }
