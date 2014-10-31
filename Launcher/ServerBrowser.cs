@@ -13,12 +13,12 @@ namespace Launcher
 {
     public class ServerBrowser
     {
-        public List<ServerViewModel> Servers { get; internal set; } 
+        public List<ServerInfo> Servers { get; internal set; } 
         private MasterServer _master;
 
         public ServerBrowser()
         {
-            Servers = new List<ServerViewModel>();
+            Servers = new List<ServerInfo>();
             _master = MasterQuery.GetMasterServerInstance(EngineType.Source);
             _master.GetAddresses(Region.US_East_coast, ReceiveServers, new IpFilter()
             {
@@ -36,12 +36,7 @@ namespace Launcher
         {
             var server = ServerQuery.GetServerInstance(EngineType.Source, endPoint);
             var info = server.GetInfo();
-            Servers.Add(new ServerViewModel
-            {
-                CurrentPlayers = info.Players, Game = info.ServerType, Hostname = info.Name,
-                IpAddress = info.Address, Map = info.Map, MaxPlayers = info.MaxPlayers, Mods = "fuck",
-                Ping = (int)info.Ping, Port = 0
-            });
+            Servers.Add(info);
         }
     }
 }
