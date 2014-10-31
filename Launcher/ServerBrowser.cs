@@ -51,13 +51,17 @@ namespace Launcher
 
             if (Servers.ContainsKey(handle))
             {
-                Servers[handle] = info;
+                lock (Servers)
+                    Servers[handle] = info;
+
                 var args = new ServerEventArgs {Handle = handle};
                 OnServerChanged(args);
             }
             else
             {
-                Servers.Add(handle, info);
+                lock (Servers)
+                    Servers.Add(handle, info);
+
                 var args = new ServerEventArgs {Handle = handle};
                 OnServerAdded(args);
             }
