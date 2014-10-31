@@ -1,20 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using CefSharp;
 using CefSharp.Wpf;
 using Newtonsoft.Json;
@@ -27,8 +16,6 @@ namespace EpochLauncher
     /// </summary>
     public partial class MainWindow : Window
     {
-
-
         public class ServerTable
         {
 	        public class ServerData
@@ -96,6 +83,11 @@ namespace EpochLauncher
 	            public string RequestHistory(int page)
 	            {
 		            return JsonConvert.SerializeObject(_table._servers[1]);
+	            }
+
+	            public void SetQuickLaunch(int serverId)
+	            {
+		            
 	            }
 
 	            public string RequestQuickLaunch()
