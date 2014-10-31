@@ -94,9 +94,6 @@ namespace EpochLauncher.ViewModel
 			};
 
 			_view.Loaded += view_Loaded;
-
-			
-
 		}
 
 		void view_Loaded(object sender, RoutedEventArgs e)
