@@ -71,7 +71,6 @@
     <Compile Include="QueryMaster\TcpQuery.cs" />
     <Compile Include="QueryMaster\UdpQuery.cs" />
     <Compile Include="QueryMaster\Util.cs" />
-    <Compile Include="Server.cs" />
     <Compile Include="ServerBrowser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings\IServerBrowserSettings.cs" />
