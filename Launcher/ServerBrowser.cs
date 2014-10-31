@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using Launcher.Events;
 using QueryMaster;
 
@@ -45,19 +46,33 @@ namespace Launcher
 
         void QueryServer(IPEndPoint endPoint)
         {
-            var server = ServerQuery.GetServerInstance(EngineType.Source, endPoint);
-            var info = server.GetInfo();
+            ServerInfo info;
+
+            try
+            {
+                var server = ServerQuery.GetServerInstance(EngineType.Source, endPoint);
+                info = server.GetInfo();
+            }
+            catch (Exception e)
+            {
+                return;
+            }
+
             var handle = info.Address.GetHashCode();
 
             if (Servers.ContainsKey(handle))
             {
-                Servers[handle] = info;
+                lock (Servers)
+                    Servers[handle] = info;
+
                 var args = new ServerEventArgs {Handle = handle};
                 OnServerChanged(args);
             }
             else
             {
-                Servers.Add(handle, info);
+                lock (Servers)
+                    Servers.Add(handle, info);
+
                 var args = new ServerEventArgs {Handle = handle};
                 OnServerAdded(args);
             }
