@@ -128,6 +128,16 @@ namespace EpochLauncher.ViewModel
 					get { return _underTheSea.Address; }
 				}
 
+				public string Map
+				{
+					get { return _underTheSea.Map; }
+				}
+
+				public int Ping
+				{
+					get { return (int)_underTheSea.Ping; }
+				}
+
 				public int Handle { get { return _underTheSea.Address.GetHashCode(); }}
 			}
 

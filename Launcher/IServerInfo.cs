@@ -14,5 +14,7 @@ namespace Launcher
 		string Port { get; }
 		string Address { get; }
 		int Handle { get; }
+		int Ping { get; }
+		string Map { get; }
 	}
 }
