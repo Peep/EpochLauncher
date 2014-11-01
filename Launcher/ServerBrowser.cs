@@ -11,26 +11,54 @@ namespace Launcher
 {
     public class ServerBrowser
     {
-        public ConcurrentDictionary<int, ServerInfo> Servers { get; internal set; }
+        public Dictionary<int, ServerInfo> Servers { get; internal set; }
 
 	    public int ServerCount;
 
         public event EventHandler<ServerEventArgs> ServerAdded;
         public event EventHandler<ServerEventArgs> ServerChanged;
 
+        public static readonly HashSet<IPEndPoint> OfficialServers = new HashSet<IPEndPoint>
+			{
+				new IPEndPoint(IPAddress.Parse("128.165.214.23"), 2303),
+                new IPEndPoint(IPAddress.Parse("5.62.103.29"), 2303),
+                new IPEndPoint(IPAddress.Parse("88.198.221.81"), 2303),
+                new IPEndPoint(IPAddress.Parse("69.162.70.162"), 2303),
+                new IPEndPoint(IPAddress.Parse("69.162.70.162"), 2403),
+                new IPEndPoint(IPAddress.Parse("193.192.58.69"), 2303),
+                new IPEndPoint(IPAddress.Parse("193.192.58.69"), 2403),
+                new IPEndPoint(IPAddress.Parse("192.254.71.234"), 2303),
+                new IPEndPoint(IPAddress.Parse("192.254.71.234"), 2403),
+                new IPEndPoint(IPAddress.Parse("178.33.137.135"), 2313),
+                new IPEndPoint(IPAddress.Parse("192.95.30.52"), 2303),
+                new IPEndPoint(IPAddress.Parse("192.99.101.126"), 2303),
+                new IPEndPoint(IPAddress.Parse("188.165.250.119"), 2365),
+                new IPEndPoint(IPAddress.Parse("62.210.83.13"), 3003),
+                new IPEndPoint(IPAddress.Parse("188.165.233.104"), 2503),
+                new IPEndPoint(IPAddress.Parse("188.165.233.104"), 2603),
+                new IPEndPoint(IPAddress.Parse("192.254.71.233"), 3203),
+                new IPEndPoint(IPAddress.Parse("192.254.71.233"), 3303),
+                new IPEndPoint(IPAddress.Parse("103.13.103.37"), 2303),
+                new IPEndPoint(IPAddress.Parse("178.33.226.75"), 2323),
+                new IPEndPoint(IPAddress.Parse("69.162.93.250"), 2702),
+			};
+
         public void Refresh()
         {
 	        ServerCount = 0;
             if (Servers == null)
-				Servers = new ConcurrentDictionary<int, ServerInfo>();
+				Servers = new Dictionary<int, ServerInfo>();
             else
                 Servers.Clear();
 
-            var master = MasterQuery.GetMasterServerInstance(EngineType.Source);
-            master.GetAddresses(Region.Rest_of_the_world, ReceiveServers, new IpFilter()
-            {
-                IsDedicated = true, GameDirectory = "Arma3"
-            });
+            //var master = MasterQuery.GetMasterServerInstance(EngineType.Source);
+            //master.GetAddresses(Region.Rest_of_the_world, ReceiveServers, new IpFilter()
+            //{
+            //    IsDedicated = true, GameDirectory = "Arma3"
+            //});
+
+            foreach (var server in OfficialServers)
+                QueryServer(server);
         }
 
         public void Refresh(int serverHandle)
@@ -61,8 +89,8 @@ namespace Launcher
                 return;
             }
 
-            if (!info.Description.Contains("Epoch"))
-                return;
+            //if (!info.Description.Contains("Epoch"))
+            //    return;
 
             var handle = info.Address.GetHashCode();
 
@@ -75,7 +103,7 @@ namespace Launcher
             }
             else
             {
-	            Servers.TryAdd(handle, info);
+	            Servers.Add(handle, info);
 
                 var args = new ServerEventArgs {Handle = handle};
                 OnServerAdded(args);
