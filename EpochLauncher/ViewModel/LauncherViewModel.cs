@@ -60,7 +60,7 @@ namespace EpochLauncher.ViewModel
 
 					var a = File.Exists(_weee.gamePath);
 
-					Process.Start(_weee.gamePath, string.Format("-mod=@Epoch -nosplash"));
+					Process.Start(_weee.gamePath, string.Format("-mod=@Epoch"));
 					return ResultSuccess;
 				}
 
@@ -84,7 +84,7 @@ namespace EpochLauncher.ViewModel
 			{
 				domain = Dns.GetHostAddresses(domain).First(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToString();
 
-				Process.Start(_weee.gamePath, string.Format("-mod=@Epoch -nosplash -connect={0} -port={1}", domain, port));
+				Process.Start(_weee.gamePath, string.Format("-mod=@Epoch -connect={0} -port={1}", domain, port));
 				return ResultSuccess;
 			}
 
