@@ -56,7 +56,7 @@ namespace EpochLauncher.ViewModel
 			{
 				if (QuickLaunch == null)
 				{
-					Process.Start("arma3.exe", string.Format("-mod=@Epoch -nosplash"));
+					Process.Start(_weee.gamePath, string.Format("-mod=@Epoch -nosplash"));
 					return ResultSuccess;
 				}
 
@@ -80,7 +80,7 @@ namespace EpochLauncher.ViewModel
 			{
 				domain = Dns.GetHostAddresses(domain).First(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToString();
 
-				Process.Start(_weee.gamePath,_ string.Format("-mod=@Epoch -nosplash -connect={0} -port={1}", domain, port));
+				Process.Start(_weee.gamePath, string.Format("-mod=@Epoch -nosplash -connect={0} -port={1}", domain, port));
 				return ResultSuccess;
 			}
 
