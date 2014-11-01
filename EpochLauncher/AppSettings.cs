@@ -90,7 +90,7 @@ namespace EpochLauncher
 				throw new Exception("Steam not found, please manually set the gamePath property in app.json");
 			}
 
-			settings.gamePath = Path.Combine((string)steamPath, "steamapps", "common", "arma3", "arma3.exe");
+			settings.gamePath = Path.Combine((string)steamPath, "steamapps", "common", "arma 3", "arma3.exe");
 
 		    File.WriteAllText(path, JsonConvert.SerializeObject(settings, Formatting.Indented));
 			return settings;

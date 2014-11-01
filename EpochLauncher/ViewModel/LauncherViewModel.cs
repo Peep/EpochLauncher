@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -56,6 +57,9 @@ namespace EpochLauncher.ViewModel
 			{
 				if (QuickLaunch == null)
 				{
+
+					var a = File.Exists(_weee.gamePath);
+
 					Process.Start(_weee.gamePath, string.Format("-mod=@Epoch -nosplash"));
 					return ResultSuccess;
 				}
