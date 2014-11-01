@@ -84,7 +84,10 @@ namespace EpochLauncher.ViewModel
 			{
 				domain = Dns.GetHostAddresses(domain).First(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToString();
 
-				Process.Start(_weee.gamePath, string.Format("-mod=@Epoch -connect={0} -port={1}", domain, port));
+
+				var connectArgs = string.Format("-mod=@Epoch -connect={0} -port={1}", domain, port);
+				File.AppendAllText("connect.log", connectArgs + "\n");
+				Process.Start(_weee.gamePath, connectArgs);
 				return ResultSuccess;
 			}
 
