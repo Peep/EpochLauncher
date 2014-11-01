@@ -57,6 +57,9 @@ namespace Launcher
                 return;
             }
 
+            if (!info.Description.Contains("Epoch"))
+                return;
+
             var handle = info.Address.GetHashCode();
 
             if (Servers.ContainsKey(handle))
@@ -90,5 +93,11 @@ namespace Launcher
             if (handler != null)
                 handler(this, e);
         }
+
+        public enum VerifiedOnly
+        {
+            Optional,
+            Required
+        };
     }
 }
