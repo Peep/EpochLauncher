@@ -10,34 +10,9 @@ namespace Launcher
 	{
 		IServerInfo Find(int jsHandle);
 
+
+		int ServerCount { get; }
 		IEnumerable<IServerInfo> ServerList { get; } 
-	}
-
-
-	public class ServerStore
-		: IServerStore
-	{
-		private Dictionary<int, IServerInfo> _infos = new Dictionary<int, IServerInfo>();
-
-		public void UpdateServer(object updateInfo)
-		{
-			
-		}
-
-		public void AddServer(object data)
-		{
-			
-		}
-
-		public IServerInfo Find(int jsHandle)
-		{
-			return _infos[jsHandle];
-		}
-
-		public IEnumerable<IServerInfo> ServerList
-		{
-			get { return _infos.Values; }
-		}
 	}
 
 }

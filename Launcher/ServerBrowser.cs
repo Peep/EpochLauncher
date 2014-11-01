@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -10,15 +11,18 @@ namespace Launcher
 {
     public class ServerBrowser
     {
-        public Dictionary<int, ServerInfo> Servers { get; internal set; }
+        public ConcurrentDictionary<int, ServerInfo> Servers { get; internal set; }
+
+	    public int ServerCount;
 
         public event EventHandler<ServerEventArgs> ServerAdded;
         public event EventHandler<ServerEventArgs> ServerChanged;
 
         public void Refresh()
         {
+	        ServerCount = 0;
             if (Servers == null)
-                Servers = new Dictionary<int, ServerInfo>();
+				Servers = new ConcurrentDictionary<int, ServerInfo>();
             else
                 Servers.Clear();
 
@@ -64,16 +68,14 @@ namespace Launcher
 
             if (Servers.ContainsKey(handle))
             {
-                lock (Servers)
-                    Servers[handle] = info;
+				Servers[handle] = info;
 
                 var args = new ServerEventArgs {Handle = handle};
                 OnServerChanged(args);
             }
             else
             {
-                lock (Servers)
-                    Servers.Add(handle, info);
+	            Servers.TryAdd(handle, info);
 
                 var args = new ServerEventArgs {Handle = handle};
                 OnServerAdded(args);
@@ -82,6 +84,7 @@ namespace Launcher
 
         protected virtual void OnServerAdded(ServerEventArgs e)
         {
+	        ServerCount++;
             var handler = ServerAdded;
             if (handler != null)
                 handler(this, e);

@@ -134,7 +134,7 @@ namespace EpochLauncher.ViewModel
 				IServerInfo[] serverList;
 				lock (_serverStore.ServerList)
 				{
-					max = Math.Min(_serverStore.ServerList.Count(), max);
+					max = Math.Min(_serverStore.ServerCount, max);
 					min = Math.Max(0, min);
 					serverList =
 						_serverStore.ServerList.Skip(min).Take(max - min).Where(ip => OfficalIps.Contains(ip.Address)).ToArray();
@@ -240,6 +240,8 @@ namespace EpochLauncher.ViewModel
 				}
 				return null;
 			}
+
+			public int ServerCount { get { return _bowbow.ServerCount; } }
 
 			public IEnumerable<IServerInfo> ServerList
 			{
