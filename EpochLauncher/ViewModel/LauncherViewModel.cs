@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -22,6 +23,26 @@ namespace EpochLauncher.ViewModel
 		{
 			private const string ResultSuccess = @"{""result"":""success""}";
 
+			public static readonly HashSet<string> OfficalIps = new HashSet<string>
+			{
+				"128.165.214.23",
+				"5.62.103.29",
+				"88.198.221.81",
+				"69.162.70.162",
+				"193.192.58.69",
+				"192.254.71.234",
+				"178.33.137.135",
+				"192.95.30.52",
+				"192.99.101.126",
+				"188.165.250.119",
+				"62.210.83.13",
+				"188.165.233.104",
+				"192.254.71.233",
+				"103.13.103.37",
+				"178.33.226.75",
+				"69.162.93.250"
+			};
+
 			public JSAdapter(IGameLauncher launcher, FiddlyDiddlyGottaHaveSomeBooty serverStore, LauncherView view)
 			{
 				_view = view;
@@ -35,6 +56,10 @@ namespace EpochLauncher.ViewModel
 			private IGameLauncher _launcher;
 			private FiddlyDiddlyGottaHaveSomeBooty _serverStore;
 			public AppSettings _weee;
+
+
+
+
 
 			public IServerInfo QuickLaunch;
 
@@ -108,7 +133,7 @@ namespace EpochLauncher.ViewModel
 			{
 				max = Math.Min(_serverStore.ServerList.Count(), max);
 				min = Math.Max(0, min);
-				var serverList = _serverStore.ServerList.Skip(min).Take(max - min).ToArray();
+				var serverList = _serverStore.ServerList.Skip(min).Take(max - min).Where(ip => OfficalIps.Contains(ip.Address)).ToArray();
 				return JsonConvert.SerializeObject(serverList);
 
 
