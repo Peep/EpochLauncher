@@ -82,7 +82,7 @@ namespace EpochLauncher
 				enableComposting = false,
 				showTools = true,
 				uri = "http://cdn.bmrf.me/UI.html",
-				quickLaunch = null
+				quickLaunch = new SeralizedServerInfo()
 			};
 
 

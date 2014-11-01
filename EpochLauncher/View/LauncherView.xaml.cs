@@ -35,7 +35,9 @@ namespace EpochLauncher.View
 
 			var settings = new CefSettings
 			{
-				PackLoadingDisabled = false
+				PackLoadingDisabled = false,
+				LogFile = "cef.log",
+				LogSeverity = LogSeverity.Verbose
 			};
 
 	        if (!Cef.Initialize(settings)) return;
@@ -51,7 +53,8 @@ namespace EpochLauncher.View
                     UniversalAccessFromFileUrlsAllowed = true,
                     WebSecurityDisabled = false,
                     PluginsDisabled = false,
-                    AcceleratedCompositingDisabled = !_viewModel.Settings.enableComposting
+                    AcceleratedCompositingDisabled = !_viewModel.Settings.enableComposting,
+					
                    
 		        },
 
@@ -70,6 +73,7 @@ namespace EpochLauncher.View
 		        WebView.ShowDevTools();
 	        }
 			_viewModel.Register(WebView);
+
 
         }
 
