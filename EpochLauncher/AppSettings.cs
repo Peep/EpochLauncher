@@ -37,6 +37,9 @@ namespace EpochLauncher
 
 		public SeralizedServerInfo(IServerInfo copy)
 		{
+			if (copy == null)
+				return;
+
 			Name = copy.Name;
 			CurrentPlayers = copy.CurrentPlayers;
 			MaxPlayers = copy.MaxPlayers;
