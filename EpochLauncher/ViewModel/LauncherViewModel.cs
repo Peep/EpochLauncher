@@ -177,7 +177,7 @@ namespace EpochLauncher.ViewModel
 
 				public string Port
 				{
-					get { return _port; }
+					get { return _underTheSea.Extra.Port.ToString(); }
 				}
 
 				public string Address
