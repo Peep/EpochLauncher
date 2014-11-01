@@ -131,27 +131,27 @@ namespace EpochLauncher.ViewModel
 
 			public string RequestServers(int min, int max)
 			{
-				max = Math.Min(_serverStore.ServerList.Count(), max);
-				min = Math.Max(0, min);
-				var serverList = _serverStore.ServerList.Skip(min).Take(max - min).Where(ip => OfficalIps.Contains(ip.Address)).ToArray();
-				return JsonConvert.SerializeObject(serverList);
-
-
-				
-				var list = new List<IServerInfo>(max - min);
-				for (var i = min; i < max; i++)
+				IServerInfo[] serverList;
+				lock (_serverStore.ServerList)
 				{
-					//list[i - min] = serverList[i];
+					max = Math.Min(_serverStore.ServerList.Count(), max);
+					min = Math.Max(0, min);
+					serverList =
+						_serverStore.ServerList.Skip(min).Take(max - min).Where(ip => OfficalIps.Contains(ip.Address)).ToArray();
 				}
-				return JsonConvert.SerializeObject(list);
+				return JsonConvert.SerializeObject(serverList);
 			}
 
 			public string RequestServer(int jsHandle)
 			{
-				var result = _serverStore.Find(jsHandle);
-				if (result == null)
+				IServerInfo result;
+				lock (_serverStore.ServerList)
 				{
-					return null;
+					result = _serverStore.Find(jsHandle);
+					if (result == null)
+					{
+						return null;
+					}
 				}
 
 				return JsonConvert.SerializeObject(result);
