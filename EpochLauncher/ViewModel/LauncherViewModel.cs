@@ -118,6 +118,8 @@ namespace EpochLauncher.ViewModel
 
 			public string GetQuickLaunch()
 			{
+				if(QuickLaunch != null)
+					QuickLaunch = _serverStore.Find(QuickLaunch.Handle);
 				return QuickLaunch != null ? JsonConvert.SerializeObject(QuickLaunch) : null;
 			}
 
