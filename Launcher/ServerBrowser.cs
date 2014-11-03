@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using Launcher.Events;
 using Newtonsoft.Json;
 using QueryMaster;
@@ -32,9 +32,14 @@ namespace Launcher
                 Servers.Clear();
 
             if (verifiedOnly)
+            {
                 using (var wc = new WebClient())
-                    OfficialServers = JsonConvert.DeserializeObject<HashSet<OfficialServerInfo>>
-                        (wc.DownloadString("https://launcher.bmrf.me/servers.json"));
+                {
+                    wc.DownloadStringCompleted += async (s, args) =>
+                        await Task.Run(() => OnServersReceived(args.Result));
+                    wc.DownloadStringAsync(new Uri("https://launcher.bmrf.me/servers.json"));
+                }
+            }
             else
             {
                 var master = MasterQuery.GetMasterServerInstance(EngineType.Source);
@@ -44,9 +49,6 @@ namespace Launcher
                     GameDirectory = "Arma3"
                 });
             }
-
-            foreach (var server in OfficialServers)
-                QueryServer(server.GetEndpoint());
         }
 
         public void Refresh(int serverHandle)
@@ -77,9 +79,6 @@ namespace Launcher
                 return;
             }
 
-            //if (!info.Description.Contains("Epoch"))
-            //    return;
-
             var handle = info.Address.GetHashCode();
 
             if (Servers.ContainsKey(handle))
@@ -98,6 +97,13 @@ namespace Launcher
             }
         }
 
+        void OnServersReceived(string json)
+        {
+            OfficialServers = JsonConvert.DeserializeObject<HashSet<OfficialServerInfo>>(json);
+            foreach (var server in OfficialServers)
+                QueryServer(server.GetEndpoint());
+        }
+
         protected virtual void OnServerAdded(ServerEventArgs e)
         {
 	        ServerCount++;
@@ -112,11 +118,5 @@ namespace Launcher
             if (handler != null)
                 handler(this, e);
         }
-
-        public enum VerifiedOnly
-        {
-            Optional,
-            Required
-        };
     }
 }
