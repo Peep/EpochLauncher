@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Launcher.Events;
 using Newtonsoft.Json;
@@ -43,7 +44,7 @@ namespace Launcher
             else
             {
                 var master = MasterQuery.GetMasterServerInstance(EngineType.Source);
-                master.GetAddresses(Region.Rest_of_the_world, ReceiveServers, new IpFilter()
+                master.GetAddresses(Region.Rest_of_the_world, ReceiveServers, new IpFilter
                 {
                     IsDedicated = true,
                     GameDirectory = "Arma3"
@@ -74,7 +75,7 @@ namespace Launcher
                 var server = ServerQuery.GetServerInstance(EngineType.Source, endPoint);
                 info = server.GetInfo();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return;
             }
@@ -97,11 +98,16 @@ namespace Launcher
             }
         }
 
+        async void QueryServerAsync(OfficialServerInfo server)
+        {
+            await Task.Run(() => QueryServer(server.GetEndpoint()));
+        }
+
         void OnServersReceived(string json)
         {
             OfficialServers = JsonConvert.DeserializeObject<HashSet<OfficialServerInfo>>(json);
             foreach (var server in OfficialServers)
-                QueryServer(server.GetEndpoint());
+                QueryServerAsync(server);
         }
 
         protected virtual void OnServerAdded(ServerEventArgs e)
