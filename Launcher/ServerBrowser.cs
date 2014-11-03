@@ -76,6 +76,17 @@ namespace Launcher
                 QueryServerAsync(server.GetEndpoint());
         }
 
+        async void QueryServerAsync(IPEndPoint endPoint)
+        {
+            if (_currentNumberOfQueries > MAX_QUERIES)
+            {
+                var wait = new SpinWait();
+                while (_currentNumberOfQueries > MAX_QUERIES) wait.SpinOnce();
+            }
+
+            await Task.Run(() => { Interlocked.Increment(ref _currentNumberOfQueries); QueryServer(endPoint); });
+        }
+
         void QueryServer(IPEndPoint endPoint)
         {
             try
@@ -108,17 +119,6 @@ namespace Launcher
             {
                 Interlocked.Decrement(ref _currentNumberOfQueries);
             }
-        }
-
-        async void QueryServerAsync(IPEndPoint endPoint)
-        {
-            if (_currentNumberOfQueries > MAX_QUERIES)
-            {
-                var wait = new SpinWait();
-                while (_currentNumberOfQueries > MAX_QUERIES) wait.SpinOnce();
-            }
-
-            await Task.Run(() => { Interlocked.Increment(ref _currentNumberOfQueries); QueryServer(endPoint); });
         }
 
         protected virtual void OnServerAdded(ServerEventArgs e)
