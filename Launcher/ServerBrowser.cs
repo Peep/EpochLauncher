@@ -18,7 +18,7 @@ namespace Launcher
         public HashSet<OfficialServerInfo> OfficialServers { get; internal set; }
 
 	    public int ServerCount;
-        private const long MAX_QUERIES = 10000;
+        private const long MAX_QUERIES = 1000;
         private static long _currentNumberOfQueries;
 
         public event EventHandler<ServerEventArgs> ServerAdded;
