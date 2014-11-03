@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -17,6 +18,8 @@ namespace Launcher
         public HashSet<OfficialServerInfo> OfficialServers { get; internal set; }
 
 	    public int ServerCount;
+        private const long MAX_QUERIES = 10000;
+        private static long _currentNumberOfQueries;
 
         public event EventHandler<ServerEventArgs> ServerAdded;
         public event EventHandler<ServerEventArgs> ServerChanged;
@@ -37,7 +40,7 @@ namespace Launcher
                 using (var wc = new WebClient())
                 {
                     wc.DownloadStringCompleted += async (s, args) =>
-                        await Task.Run(() => OnServersReceived(args.Result));
+                        await Task.Run(() => ReceiveServers(args.Result));
                     wc.DownloadStringAsync(new Uri("https://launcher.bmrf.me/servers.json"));
                 }
             }
@@ -62,52 +65,60 @@ namespace Launcher
 
         void ReceiveServers(ReadOnlyCollection<IPEndPoint> endPoints)
         {
-            foreach (var ip in endPoints.Where(ip => ip.Address.ToString() != "0.0.0.0"))
-                QueryServer(ip);
+            foreach (var endPoint in endPoints.Where(ip => ip.Address.ToString() != "0.0.0.0"))
+                QueryServerAsync(endPoint);
+        }
+
+        void ReceiveServers(string json)
+        {
+            OfficialServers = JsonConvert.DeserializeObject<HashSet<OfficialServerInfo>>(json);
+            foreach (var server in OfficialServers)
+                QueryServerAsync(server.GetEndpoint());
         }
 
         void QueryServer(IPEndPoint endPoint)
         {
-            ServerInfo info;
-
             try
             {
                 var server = ServerQuery.GetServerInstance(EngineType.Source, endPoint);
-                info = server.GetInfo();
+                var info = server.GetInfo();
+
+                var handle = info.Address.GetHashCode();
+
+                if (Servers.ContainsKey(handle))
+                {
+                    Servers[handle] = info;
+
+                    var args = new ServerEventArgs {Handle = handle};
+                    OnServerChanged(args);
+                }
+                else
+                {
+                    Servers.Add(handle, info);
+
+                    var args = new ServerEventArgs {Handle = handle};
+                    OnServerAdded(args);
+                }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return;
+                Debug.WriteLine(e.Message);
             }
-
-            var handle = info.Address.GetHashCode();
-
-            if (Servers.ContainsKey(handle))
+            finally
             {
-				Servers[handle] = info;
-
-                var args = new ServerEventArgs {Handle = handle};
-                OnServerChanged(args);
-            }
-            else
-            {
-	            Servers.Add(handle, info);
-
-                var args = new ServerEventArgs {Handle = handle};
-                OnServerAdded(args);
+                Interlocked.Decrement(ref _currentNumberOfQueries);
             }
         }
 
-        async void QueryServerAsync(OfficialServerInfo server)
+        async void QueryServerAsync(IPEndPoint endPoint)
         {
-            await Task.Run(() => QueryServer(server.GetEndpoint()));
-        }
+            if (_currentNumberOfQueries > MAX_QUERIES)
+            {
+                var wait = new SpinWait();
+                while (_currentNumberOfQueries > MAX_QUERIES) wait.SpinOnce();
+            }
 
-        void OnServersReceived(string json)
-        {
-            OfficialServers = JsonConvert.DeserializeObject<HashSet<OfficialServerInfo>>(json);
-            foreach (var server in OfficialServers)
-                QueryServerAsync(server);
+            await Task.Run(() => { Interlocked.Increment(ref _currentNumberOfQueries); QueryServer(endPoint); });
         }
 
         protected virtual void OnServerAdded(ServerEventArgs e)
