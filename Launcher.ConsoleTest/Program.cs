@@ -15,7 +15,6 @@ namespace Launcher.ConsoleTest
         {
             browser = new ServerBrowser();
             browser.ServerAdded += OnServerAdded;
-            browser.ServerChanged += OnServerChanged;
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             browser.Refresh();
