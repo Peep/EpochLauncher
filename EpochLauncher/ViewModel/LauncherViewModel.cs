@@ -236,10 +236,10 @@ namespace EpochLauncher.ViewModel
 			public IServerInfo Find(string jsHandle)
 			{
 				ServerInfo data;
-				if (_bowbow.Servers.TryGetValue(jsHandle, out data))
-				{
-					return new BOOTYSWEAT(data);
-				}
+                if (_bowbow.Servers.TryGetValue(jsHandle, out data))
+                {
+                    return new BOOTYSWEAT(data);
+                }
 				return null;
 			}
 
