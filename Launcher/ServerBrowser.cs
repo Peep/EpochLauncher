@@ -63,7 +63,8 @@ namespace Launcher
 
         void ReceiveServers(ReadOnlyCollection<IPEndPoint> endPoints)
         {
-            foreach (var endPoint in endPoints.Where(ip => ip.Address.ToString() != "0.0.0.0"))
+            Console.WriteLine("TOTAL SERVERS TO QUERY:" + endPoints.Count);
+            foreach (var endPoint in endPoints.Where(ip => ip.Address.ToString() != "0.0.0.0"))        
                 QueryServerAsync(endPoint);
         }
 
@@ -76,12 +77,12 @@ namespace Launcher
 
         async void QueryServerAsync(IPEndPoint endPoint)
         {
-            if (_currentNumberOfQueries > MAX_QUERIES)
-            {
-                var wait = new SpinWait();
-                while (_currentNumberOfQueries > MAX_QUERIES) wait.SpinOnce();
-            }
-
+            //if (_currentNumberOfQueries > MAX_QUERIES)
+            //{
+            //    var wait = new SpinWait();
+            //    while (_currentNumberOfQueries > MAX_QUERIES) wait.SpinOnce();
+            //}
+            Console.WriteLine("THREADS:" + _currentNumberOfQueries);
             await Task.Run(() => { Interlocked.Increment(ref _currentNumberOfQueries); QueryServer(endPoint); });
         }
 
