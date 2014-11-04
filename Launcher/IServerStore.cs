@@ -9,9 +9,9 @@ namespace Launcher
 	public interface IServerStore
 	{
 		IServerInfo Find(int jsHandle);
-
-
 		int ServerCount { get; }
+		void Refresh(int handle);
+		void Refresh();
 		IEnumerable<IServerInfo> ServerList { get; } 
 	}
 

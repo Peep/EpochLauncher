@@ -57,10 +57,6 @@ namespace EpochLauncher.ViewModel
 			private FiddlyDiddlyGottaHaveSomeBooty _serverStore;
 			public AppSettings _weee;
 
-
-
-
-
 			public IServerInfo QuickLaunch;
 
 			public void Minimize()
@@ -118,9 +114,12 @@ namespace EpochLauncher.ViewModel
 
 			public string GetQuickLaunch()
 			{
-				if(QuickLaunch != null)
+				if (QuickLaunch != null)
+				{		
 					QuickLaunch = _serverStore.Find(QuickLaunch.Handle);
-				return QuickLaunch != null ? JsonConvert.SerializeObject(QuickLaunch) : null;
+				}
+
+				return QuickLaunch != null ? JsonConvert.SerializeObject(QuickLaunch) : @"{""Handle"":0}";
 			}
 
 			public void SetQuickLaunch(int jsHandle)
@@ -149,6 +148,7 @@ namespace EpochLauncher.ViewModel
 				IServerInfo result;
 				lock (_serverStore.ServerList)
 				{
+					_serverStore.Refresh(jsHandle);
 					result = _serverStore.Find(jsHandle);
 					if (result == null)
 					{
@@ -241,6 +241,16 @@ namespace EpochLauncher.ViewModel
 					return new BOOTYSWEAT(data);
 				}
 				return null;
+			}
+
+			public void Refresh(int handle)
+			{
+				_bowbow.Refresh(handle);
+			}
+
+			public void Refresh()
+			{
+				_bowbow.Refresh();
 			}
 
 			public int ServerCount { get { return _bowbow.ServerCount; } }
