@@ -82,10 +82,6 @@ namespace Launcher
                 Debug.WriteLine(e.Message);
                 return null;
             }
-            finally
-            {
-                Interlocked.Decrement(ref _currentNumberOfQueries);
-            }
         }
 
         protected virtual void OnServerAdded(ServerEventArgs e)
