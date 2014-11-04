@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 using Launcher.Events;
 using Newtonsoft.Json;
@@ -15,12 +13,9 @@ namespace Launcher
     public class ServerBrowser
     {
 	    public int ServerCount;
-        private static long _currentNumberOfQueries;
-
         public event EventHandler<ServerEventArgs> ServerAdded;
-        public event EventHandler<ServerEventArgs> ServerChanged;
 
-        public void Refresh(bool verifiedOnly = false)
+        public void Refresh(bool verifiedOnly = true)
         {
             ServerCount = 0;
 
@@ -39,7 +34,7 @@ namespace Launcher
                 master.GetAddresses(Region.Rest_of_the_world, ReceiveServers, new IpFilter
                 {
                     IsDedicated = true,
-                    //GameDirectory = "Arma3"
+                    GameDirectory = "Arma3"
                 });
             }
         }
@@ -67,34 +62,22 @@ namespace Launcher
         {
             try
             {
-                var server = ServerQuery.GetServerInstance(EngineType.Source, endPoint, false, 1000, 1000);
+                var server = ServerQuery.GetServerInstance(EngineType.Source, endPoint);
                 var info = server.GetInfo();
-
                 var handle = String.Format("{0}:{1}", info.Address, info.Extra.Port);
-
                 var args = new ServerEventArgs { Handle = handle, Server = info };
-                OnServerAdded(args);
 
+                OnServerAdded(args);
                 return info;
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-                return null;
-            }
+            } 
+            catch {}
+            return null;
         }
 
         protected virtual void OnServerAdded(ServerEventArgs e)
         {
 	        ServerCount++;
             var handler = ServerAdded;
-            if (handler != null)
-                handler(this, e);
-        }
-
-        protected virtual void OnServerChanged(ServerEventArgs e)
-        {
-            var handler = ServerChanged;
             if (handler != null)
                 handler(this, e);
         }
