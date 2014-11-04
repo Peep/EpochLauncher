@@ -20,7 +20,7 @@ namespace Launcher.ConsoleTest
 
         static void OnServerAdded(object sender, ServerEventArgs e)
         {
-            Console.WriteLine("{0} ({1}) players", browser.Servers[e.Handle].Name, browser.Servers[e.Handle].Players);
+            Console.WriteLine(browser.ServerCount);
         }
 
         static void OnServerChanged(object sender, ServerEventArgs e)

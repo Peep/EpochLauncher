@@ -8,9 +8,10 @@ namespace Launcher
 {
 	public interface IServerStore
 	{
-		IServerInfo Find(int jsHandle);
+		IServerInfo Find(string jsHandle);
+
 		int ServerCount { get; }
-		void Refresh(int handle);
+		void Refresh(string handle);
 		void Refresh();
 		IEnumerable<IServerInfo> ServerList { get; } 
 	}

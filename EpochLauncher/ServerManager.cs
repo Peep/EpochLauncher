@@ -6,16 +6,23 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using Launcher;
+using Launcher.Events;
 using QueryMaster;
 
 namespace EpochLauncher
 {
 	public class ServerManager
+		: IServerStore
 	{
-		private ServerBrowser _browser;
-		private ConcurrentDictionary<string, IServerInfo> _readyServers;
-		private Dispatcher _dispatcher;
+		private readonly ServerBrowser _browser;
+		private readonly ConcurrentDictionary<string, IServerInfo> _readyServers;
+		private readonly Dispatcher _dispatcher;
 
+		public IServerInfo JS_RequestInfo(string handle)
+		{
+			JS_RequestUpdate(handle);
+			return Find(handle);
+		}
 
 		public void JS_RequestUpdate(string handle)
 		{
@@ -24,7 +31,7 @@ namespace EpochLauncher
 
 		public void UI_RequestUpdate(string handle)
 		{
-			
+			_browser.Refresh(handle);
 		}
 
 		public ServerManager(Dispatcher mainDispatcher)
@@ -33,7 +40,46 @@ namespace EpochLauncher
 			_readyServers = new ConcurrentDictionary<string, IServerInfo>();
 			_dispatcher = mainDispatcher;
 
+			_browser.ServerAdded += BrowserOnServerAdded;
+			_browser.ServerChanged += BrowserOnServerChanged;
 
+		}
+
+		private void BrowserOnServerChanged(object sender, ServerEventArgs serverEventArgs)
+		{
+			
+		}
+
+		private void BrowserOnServerAdded(object sender, ServerEventArgs serverEventArgs)
+		{
+			
+		}
+
+		public IServerInfo Find(string jsHandle)
+		{
+			IServerInfo info;
+			_readyServers.TryGetValue(jsHandle, out info);
+			return info;
+		}
+
+		public int ServerCount
+		{
+			get { return _readyServers.Count; }
+		}
+
+		public void Refresh(string handle)
+		{
+			UI_RequestUpdate(handle);
+		}
+
+		public void Refresh()
+		{
+			throw new NotImplementedException();
+		}
+
+		public IEnumerable<IServerInfo> ServerList
+		{
+			get { return _readyServers.Values; }
 		}
 	}
 }

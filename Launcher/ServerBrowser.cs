@@ -14,7 +14,7 @@ namespace Launcher
 {
     public class ServerBrowser
     {
-        public Dictionary<int, ServerInfo> Servers { get; internal set; }
+        public Dictionary<string, ServerInfo> Servers { get; internal set; }
         public HashSet<OfficialServerInfo> OfficialServers { get; internal set; }
 
 	    public int ServerCount;
@@ -24,16 +24,14 @@ namespace Launcher
         public event EventHandler<ServerEventArgs> ServerAdded;
         public event EventHandler<ServerEventArgs> ServerChanged;
 
-        public void Refresh(bool verifiedOnly = true)
+        public void Refresh(bool verifiedOnly = false)
         {
             if (OfficialServers == null)
                 OfficialServers = new HashSet<OfficialServerInfo>();
 
             ServerCount = 0;
             if (Servers == null)
-                Servers = new Dictionary<int, ServerInfo>();
-            else
-                Servers.Clear();
+                Servers = new Dictionary<string, ServerInfo>();
 
             if (verifiedOnly)
             {
@@ -55,7 +53,7 @@ namespace Launcher
             }
         }
 
-        public void Refresh(int serverHandle)
+        public void Refresh(string serverHandle)
         {
             if (!Servers.ContainsKey(serverHandle)) return;
 
@@ -65,7 +63,8 @@ namespace Launcher
 
         void ReceiveServers(ReadOnlyCollection<IPEndPoint> endPoints)
         {
-            foreach (var endPoint in endPoints.Where(ip => ip.Address.ToString() != "0.0.0.0"))
+            Console.WriteLine("TOTAL SERVERS TO QUERY:" + endPoints.Count);
+            foreach (var endPoint in endPoints.Where(ip => ip.Address.ToString() != "0.0.0.0"))        
                 QueryServerAsync(endPoint);
         }
 
@@ -78,12 +77,12 @@ namespace Launcher
 
         async void QueryServerAsync(IPEndPoint endPoint)
         {
-            if (_currentNumberOfQueries > MAX_QUERIES)
-            {
-                var wait = new SpinWait();
-                while (_currentNumberOfQueries > MAX_QUERIES) wait.SpinOnce();
-            }
-
+            //if (_currentNumberOfQueries > MAX_QUERIES)
+            //{
+            //    var wait = new SpinWait();
+            //    while (_currentNumberOfQueries > MAX_QUERIES) wait.SpinOnce();
+            //}
+            Console.WriteLine("THREADS:" + _currentNumberOfQueries);
             await Task.Run(() => { Interlocked.Increment(ref _currentNumberOfQueries); QueryServer(endPoint); });
         }
 
@@ -94,7 +93,7 @@ namespace Launcher
                 var server = ServerQuery.GetServerInstance(EngineType.Source, endPoint);
                 var info = server.GetInfo();
 
-                var handle = info.Address.GetHashCode();
+                var handle = String.Format("{0}:{1}", info.Address, info.Extra.Port);
 
                 if (Servers.ContainsKey(handle))
                 {

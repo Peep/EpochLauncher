@@ -8,6 +8,6 @@ namespace Launcher.Events
 {
     public class ServerEventArgs
     {
-        public int Handle { get; internal set; }
+        public string Handle { get; internal set; }
     }
 }

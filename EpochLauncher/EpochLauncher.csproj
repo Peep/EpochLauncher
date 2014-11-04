@@ -126,6 +126,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppSettings.cs" />
+    <Compile Include="ServerInfo.cs" />
+    <Compile Include="ServerManager.cs" />
     <Compile Include="UpdatePromptWindow.xaml.cs">
       <DependentUpon>UpdatePromptWindow.xaml</DependentUpon>
     </Compile>

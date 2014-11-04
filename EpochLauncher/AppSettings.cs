@@ -19,7 +19,7 @@ namespace EpochLauncher
 		public int MaxPlayers { get; set; }
 		public string Port { get; set; }
 		public string Address { get; set; }
-		public int Handle { get; set; }
+		public string Handle { get; set; }
 		public int Ping { get; set; }
 		public string Map { get; set; }
 
@@ -30,7 +30,7 @@ namespace EpochLauncher
 			MaxPlayers = 0;
 			Port = "00";
 			Address = "0.0.0.0";
-			Handle = 0;
+			Handle = null;
 			Ping = 0;
 			Map = "";
 		}

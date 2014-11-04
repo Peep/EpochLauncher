@@ -30,5 +30,10 @@ namespace EpochLauncher
 			Ping = (int)info.Ping;
 			Map = info.Map;
 		}
+
+		public ServerInfo(QueryMaster.ServerInfo info)
+		{
+			Update(info);
+		}
 	}
 }
