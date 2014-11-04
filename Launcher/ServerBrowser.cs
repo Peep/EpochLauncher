@@ -14,9 +14,6 @@ namespace Launcher
 {
     public class ServerBrowser
     {
-        public Dictionary<string, ServerInfo> Servers { get; internal set; }
-        public HashSet<OfficialServerInfo> OfficialServers { get; internal set; }
-
 	    public int ServerCount;
         private const long MAX_QUERIES = 1000;
         private static long _currentNumberOfQueries;
@@ -26,12 +23,7 @@ namespace Launcher
 
         public void Refresh(bool verifiedOnly = false)
         {
-            if (OfficialServers == null)
-                OfficialServers = new HashSet<OfficialServerInfo>();
-
             ServerCount = 0;
-            if (Servers == null)
-                Servers = new Dictionary<string, ServerInfo>();
 
             if (verifiedOnly)
             {
@@ -48,17 +40,15 @@ namespace Launcher
                 master.GetAddresses(Region.Rest_of_the_world, ReceiveServers, new IpFilter
                 {
                     IsDedicated = true,
-                    GameDirectory = "Arma3"
+                    //GameDirectory = "Arma3"
                 });
             }
         }
 
-        public void Refresh(string serverHandle)
-        {
-            if (!Servers.ContainsKey(serverHandle)) return;
-
-            var address = Servers[serverHandle].Address.Split(':');
-            QueryServer(new IPEndPoint(IPAddress.Parse(address[0]), Convert.ToInt32(address[1])));
+        public async Task<ServerInfo> Refresh(IServerInfo info)
+        {          
+            var address = info.Address.Split(':');
+            return await QueryServerAsync(new IPEndPoint(IPAddress.Parse(address[0]), Convert.ToInt32(address[1])));
         }
 
         void ReceiveServers(ReadOnlyCollection<IPEndPoint> endPoints)
@@ -70,23 +60,23 @@ namespace Launcher
 
         void ReceiveServers(string json)
         {
-            OfficialServers = JsonConvert.DeserializeObject<HashSet<OfficialServerInfo>>(json);
-            foreach (var server in OfficialServers)
+            var servers = JsonConvert.DeserializeObject<HashSet<OfficialServerInfo>>(json);
+            foreach (var server in servers)
                 QueryServerAsync(server.GetEndpoint());
         }
 
-        async void QueryServerAsync(IPEndPoint endPoint)
+        async Task<ServerInfo> QueryServerAsync(IPEndPoint endPoint)
         {
-            //if (_currentNumberOfQueries > MAX_QUERIES)
-            //{
-            //    var wait = new SpinWait();
-            //    while (_currentNumberOfQueries > MAX_QUERIES) wait.SpinOnce();
-            //}
+            if (_currentNumberOfQueries > MAX_QUERIES)
+            {
+                var wait = new SpinWait();
+                while (_currentNumberOfQueries > MAX_QUERIES) wait.SpinOnce();
+            }
             Console.WriteLine("THREADS:" + _currentNumberOfQueries);
-            await Task.Run(() => { Interlocked.Increment(ref _currentNumberOfQueries); QueryServer(endPoint); });
+            return await Task.Run(() => { Interlocked.Increment(ref _currentNumberOfQueries); return QueryServer(endPoint); });
         }
 
-        void QueryServer(IPEndPoint endPoint)
+        ServerInfo QueryServer(IPEndPoint endPoint)
         {
             try
             {
@@ -95,24 +85,15 @@ namespace Launcher
 
                 var handle = String.Format("{0}:{1}", info.Address, info.Extra.Port);
 
-                if (Servers.ContainsKey(handle))
-                {
-                    Servers[handle] = info;
+                var args = new ServerEventArgs { Handle = handle, Server = info };
+                OnServerAdded(args);
 
-                    var args = new ServerEventArgs {Handle = handle};
-                    OnServerChanged(args);
-                }
-                else
-                {
-                    Servers.Add(handle, info);
-
-                    var args = new ServerEventArgs {Handle = handle};
-                    OnServerAdded(args);
-                }
+                return info;
             }
             catch (Exception e)
             {
                 Debug.WriteLine(e.Message);
+                return null;
             }
             finally
             {
