@@ -43,7 +43,7 @@ namespace EpochLauncher.ViewModel
 				"69.162.93.250"
 			};
 
-			public JSAdapter(IGameLauncher launcher, FiddlyDiddlyGottaHaveSomeBooty serverStore, LauncherView view)
+			public JSAdapter(IGameLauncher launcher, ServerManager serverStore, LauncherView view)
 			{
 				_view = view;
 				_launcher = launcher;
@@ -54,7 +54,7 @@ namespace EpochLauncher.ViewModel
 			private List<IServerInfo> _sortedServers;
 			private LauncherView _view;
 			private IGameLauncher _launcher;
-			private FiddlyDiddlyGottaHaveSomeBooty _serverStore;
+			private ServerManager _serverStore;
 			public AppSettings _weee;
 
 			public IServerInfo QuickLaunch;
@@ -132,143 +132,20 @@ namespace EpochLauncher.ViewModel
 
 			public string RequestServers(int min, int max)
 			{
-				IServerInfo[] serverList;
-				lock (_serverStore.ServerList)
-				{
-					max = Math.Min(_serverStore.ServerCount, max);
-					min = Math.Max(0, min);
-					serverList =
-						_serverStore.ServerList.Skip(min).Take(max - min).Where(ip => OfficalIps.Contains(ip.Address)).ToArray();
-				}
-				return JsonConvert.SerializeObject(serverList);
+				_serverStore.JS_RequestRefresh();
+				return JsonConvert.SerializeObject(_serverStore.JS_RequestServers(min, max));
 			}
 
 			public string RequestServer(string jsHandle)
 			{
-				IServerInfo result;
-				lock (_serverStore.ServerList)
-				{
-					_serverStore.Refresh(jsHandle);
-					result = _serverStore.Find(jsHandle);
-					if (result == null)
-					{
-						return null;
-					}
-				}
-
-				return JsonConvert.SerializeObject(result);
+				return JsonConvert.SerializeObject(_serverStore.JS_RequestServer(jsHandle));
 			}
 		}
-
-		private class FiddlyDiddlyGottaHaveSomeBooty
-			: IServerStore
-		{
-			public class BOOTYSWEAT
-				: IServerInfo
-			{
-				private ServerInfo _underTheSea;
-				private string _addr;
-				private string _port;
-
-				public BOOTYSWEAT(ServerInfo info)
-				{
-					_underTheSea = info;
-					var split = info.Address.Split(new [] {':'});
-					if (split.Length != 2)
-					{
-						_addr = "0.0.0.0";
-						_port = "0000";
-					}
-					else
-					{
-						_addr = split[0].Trim();
-						_port = split[1].Trim();
-					}
-				}
-
-
-				public string Name
-				{
-					get { return _underTheSea.Name; }
-				}
-
-				public int CurrentPlayers
-				{
-					get { return _underTheSea.Players; }
-				}
-
-				public int MaxPlayers
-				{
-					get { return _underTheSea.MaxPlayers; }
-				}
-
-				public string Port
-				{
-					get { return _underTheSea.Extra.Port.ToString(); }
-				}
-
-				public string Address
-				{
-					get { return _addr; }
-				}
-
-				public string Map
-				{
-					get { return _underTheSea.Map; }
-				}
-
-				public int Ping
-				{
-					get { return (int)_underTheSea.Ping; }
-				}
-
-                public string Handle { get { return String.Format("{0}:{1}", _underTheSea.Address, _underTheSea.Extra.Port); } }
-			}
-
-			private ServerBrowser _bowbow;
-
-			public FiddlyDiddlyGottaHaveSomeBooty()
-			{
-				_bowbow = new ServerBrowser();
-				_bowbow.Refresh();
-			}
-
-			public IServerInfo Find(string jsHandle)
-			{
-				ServerInfo data;
-                if (_bowbow.Servers.TryGetValue(jsHandle, out data))
-                {
-                    return new BOOTYSWEAT(data);
-                }
-				return null;
-			}
-
-			public void Refresh(int handle)
-			{
-				_bowbow.Refresh(handle);
-			}
-
-			public void Refresh()
-			{
-				_bowbow.Refresh();
-			}
-
-			public int ServerCount { get { return _bowbow.ServerCount; } }
-
-			public IEnumerable<IServerInfo> ServerList
-			{
-				get { return _bowbow.Servers.Values.Select(x => new BOOTYSWEAT(x)); }
-			}
-		}
-
-
-
-
 
 		private LauncherView _view;
 		private readonly JSAdapter _jsAdapter;
 
-		public readonly IServerStore ServerStore;
+		public readonly ServerManager ServerStore;
 		public readonly IGameLauncher Launcher;
 		public readonly AppSettings Settings;
 
@@ -278,8 +155,8 @@ namespace EpochLauncher.ViewModel
 		public LauncherViewModel(LauncherView view)
 		{
 			_view = view;
-			ServerStore = new FiddlyDiddlyGottaHaveSomeBooty();
-			_jsAdapter = new JSAdapter(null, (FiddlyDiddlyGottaHaveSomeBooty)ServerStore, _view);
+			ServerStore = new ServerManager(view.Dispatcher);
+			_jsAdapter = new JSAdapter(null, ServerStore, _view);
 
 			Settings = AppSettings.GetSettings("app.json");
 			_jsAdapter._weee = Settings;

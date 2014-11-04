@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using Launcher;
@@ -15,10 +16,13 @@ namespace EpochLauncher
 		: IServerStore
 	{
 		private readonly ServerBrowser _browser;
-		private readonly ConcurrentDictionary<string, IServerInfo> _readyServers;
+		private readonly ConcurrentDictionary<string, ServerInfo> _readyServers;
 		private readonly Dispatcher _dispatcher;
 
-		public IServerInfo JS_RequestInfo(string handle)
+
+		private List<ServerInfo> _sortedServers; 
+
+		public IServerInfo JS_RequestServer(string handle)
 		{
 			var info = Find(handle);
 			JS_RequestUpdate(handle);
@@ -30,36 +34,80 @@ namespace EpochLauncher
 			_dispatcher.InvokeAsync(() => UI_RequestUpdate(handle));
 		}
 
+		public void JS_RequestRefresh()
+		{
+			_dispatcher.InvokeAsync(UI_RequestRefresh);
+		}
+
 		public void UI_RequestUpdate(string handle)
 		{
 			var info = Find(handle);
+			if (info == null)
+				return;
+
 			_browser.Refresh(info);
+		}
+
+		public void UI_RequestUpdate(ServerInfo info)
+		{
+			_browser.Refresh(info);
+		}
+
+		public void UI_RequestRefresh()
+		{
+			ServerInfo.MarkAllInvalid(10);
+			_browser.Refresh();
+		}
+
+		public IEnumerable<IServerInfo> JS_RequestServers(int min, int max)
+		{
+			if (_sortedServers == null)
+			{
+				_sortedServers = _readyServers.Values.Where(info => info.Valid).ToList();
+				_sortedServers.Sort((info, serverInfo) => info.LastUpdate.CompareTo(serverInfo.LastUpdate));
+			}
+
+			min = Math.Max(min, 0);
+			max = Math.Min(max, _sortedServers.Count);
+
+			return _sortedServers.Skip(min).Take(max);
 		}
 
 		public ServerManager(Dispatcher mainDispatcher)
 		{
 			_browser = new ServerBrowser();
-			_readyServers = new ConcurrentDictionary<string, IServerInfo>();
+			_readyServers = new ConcurrentDictionary<string, ServerInfo>();
 			_dispatcher = mainDispatcher;
 
-			_browser.ServerAdded += BrowserOnServerAdded;
+			_browser.ServerAdded += BrowserOnServerChanged;
 			_browser.ServerChanged += BrowserOnServerChanged;
 
+			_browser.Refresh(true);
+		}
+
+		private static Func<string, ServerInfo, ServerInfo> _makeUpdate(QueryMaster.ServerInfo newInfo)
+		{
+			return (s, info) =>
+			{
+				info.Update(newInfo);
+				return info;
+			};
+		}
+
+		private static Func<string, ServerInfo> _makeAdd(QueryMaster.ServerInfo newInfo)
+		{
+			return s => new ServerInfo(newInfo);
 		}
 
 		private void BrowserOnServerChanged(object sender, ServerEventArgs serverEventArgs)
 		{
-			
-		}
-
-		private void BrowserOnServerAdded(object sender, ServerEventArgs serverEventArgs)
-		{
-			var info = new ServerInfo(serverEventArgs.Server);
+			_readyServers.AddOrUpdate(serverEventArgs.Handle, _makeAdd(serverEventArgs.Server),
+				_makeUpdate(serverEventArgs.Server));
 		}
 
 		public IServerInfo Find(string jsHandle)
 		{
-			IServerInfo info;
+			ServerInfo info;
 			_readyServers.TryGetValue(jsHandle, out info);
 			return info;
 		}
@@ -71,12 +119,16 @@ namespace EpochLauncher
 
 		public void Refresh(string handle)
 		{
-			UI_RequestUpdate(handle);
+			if(Thread.CurrentThread == _dispatcher.Thread)
+				UI_RequestUpdate(handle);
+			else JS_RequestUpdate(handle);
 		}
 
 		public void Refresh()
 		{
-			throw new NotImplementedException();
+			if (Thread.CurrentThread == _dispatcher.Thread)
+				UI_RequestRefresh();
+			else JS_RequestRefresh();
 		}
 
 		public IEnumerable<IServerInfo> ServerList
