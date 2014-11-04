@@ -20,8 +20,9 @@ namespace EpochLauncher
 
 		public IServerInfo JS_RequestInfo(string handle)
 		{
+			var info = Find(handle);
 			JS_RequestUpdate(handle);
-			return Find(handle);
+			return info;
 		}
 
 		public void JS_RequestUpdate(string handle)
@@ -31,7 +32,8 @@ namespace EpochLauncher
 
 		public void UI_RequestUpdate(string handle)
 		{
-			_browser.Refresh(handle);
+			var info = Find(handle);
+			_browser.Refresh(info);
 		}
 
 		public ServerManager(Dispatcher mainDispatcher)
@@ -52,7 +54,7 @@ namespace EpochLauncher
 
 		private void BrowserOnServerAdded(object sender, ServerEventArgs serverEventArgs)
 		{
-			
+			var info = new ServerInfo(serverEventArgs.Server);
 		}
 
 		public IServerInfo Find(string jsHandle)
