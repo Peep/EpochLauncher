@@ -24,7 +24,7 @@ namespace Launcher
         public event EventHandler<ServerEventArgs> ServerAdded;
         public event EventHandler<ServerEventArgs> ServerChanged;
 
-        public void Refresh(bool verifiedOnly = true)
+        public void Refresh(bool verifiedOnly = false)
         {
             if (OfficialServers == null)
                 OfficialServers = new HashSet<OfficialServerInfo>();

@@ -6,7 +6,17 @@ using System.Threading.Tasks;
 
 namespace Launcher
 {
-    class DownloadManager
+    public class DownloadManager
     {
+       
+    }
+
+    public enum DownloadState
+    {
+        Downloading,
+        Paused,
+        Completed,
+        Corrupted,
+        UpdateAvailable
     }
 }
