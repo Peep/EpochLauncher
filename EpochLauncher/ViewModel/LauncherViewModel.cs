@@ -93,7 +93,7 @@ namespace EpochLauncher.ViewModel
 			}
 
 		
-			public string ConnectTo(int serverHash)
+			public string ConnectTo(string serverHash)
 			{
 				var server = _serverStore.Find(serverHash);
 				if (server == null)
@@ -123,9 +123,9 @@ namespace EpochLauncher.ViewModel
 				return QuickLaunch != null ? JsonConvert.SerializeObject(QuickLaunch) : null;
 			}
 
-			public void SetQuickLaunch(int jsHandle)
+			public void SetQuickLaunch(string jsHandle)
 			{
-				if (jsHandle == 0)
+				if (jsHandle == null)
 					QuickLaunch = null;
 				else
 					QuickLaunch = _serverStore.Find(jsHandle);
@@ -144,7 +144,7 @@ namespace EpochLauncher.ViewModel
 				return JsonConvert.SerializeObject(serverList);
 			}
 
-			public string RequestServer(int jsHandle)
+			public string RequestServer(string jsHandle)
 			{
 				IServerInfo result;
 				lock (_serverStore.ServerList)
@@ -222,7 +222,7 @@ namespace EpochLauncher.ViewModel
 					get { return (int)_underTheSea.Ping; }
 				}
 
-				public int Handle { get { return _underTheSea.Address.GetHashCode(); }}
+                public string Handle { get { return String.Format("{0}:{1}", _underTheSea.Address, _underTheSea.Extra.Port); } }
 			}
 
 			private ServerBrowser _bowbow;
@@ -233,7 +233,7 @@ namespace EpochLauncher.ViewModel
 				_bowbow.Refresh();
 			}
 
-			public IServerInfo Find(int jsHandle)
+			public IServerInfo Find(string jsHandle)
 			{
 				ServerInfo data;
 				if (_bowbow.Servers.TryGetValue(jsHandle, out data))

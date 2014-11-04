@@ -8,7 +8,7 @@ namespace Launcher
 {
 	public interface IServerStore
 	{
-		IServerInfo Find(int jsHandle);
+		IServerInfo Find(string jsHandle);
 
 
 		int ServerCount { get; }

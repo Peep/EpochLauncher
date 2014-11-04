@@ -13,7 +13,7 @@ namespace Launcher
 		int MaxPlayers { get; }
 		string Port { get; }
 		string Address { get; }
-		int Handle { get; }
+		string Handle { get; }
 		int Ping { get; }
 		string Map { get; }
 	}

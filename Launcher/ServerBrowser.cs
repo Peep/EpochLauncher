@@ -14,7 +14,7 @@ namespace Launcher
 {
     public class ServerBrowser
     {
-        public Dictionary<int, ServerInfo> Servers { get; internal set; }
+        public Dictionary<string, ServerInfo> Servers { get; internal set; }
         public HashSet<OfficialServerInfo> OfficialServers { get; internal set; }
 
 	    public int ServerCount;
@@ -31,7 +31,7 @@ namespace Launcher
 
             ServerCount = 0;
             if (Servers == null)
-                Servers = new Dictionary<int, ServerInfo>();
+                Servers = new Dictionary<string, ServerInfo>();
 
             if (verifiedOnly)
             {
@@ -53,7 +53,7 @@ namespace Launcher
             }
         }
 
-        public void Refresh(int serverHandle)
+        public void Refresh(string serverHandle)
         {
             if (!Servers.ContainsKey(serverHandle)) return;
 
@@ -92,7 +92,7 @@ namespace Launcher
                 var server = ServerQuery.GetServerInstance(EngineType.Source, endPoint);
                 var info = server.GetInfo();
 
-                var handle = info.Address.GetHashCode();
+                var handle = String.Format("{0}:{1}", info.Address, info.Extra.Port);
 
                 if (Servers.ContainsKey(handle))
                 {
