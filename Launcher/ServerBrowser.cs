@@ -45,10 +45,10 @@ namespace Launcher
             }
         }
 
-        public void Refresh(IServerInfo info)
+        public async Task<ServerInfo> Refresh(IServerInfo info)
         {          
             var address = info.Address.Split(':');
-            QueryServer(new IPEndPoint(IPAddress.Parse(address[0]), Convert.ToInt32(address[1])));
+            return await QueryServerAsync(new IPEndPoint(IPAddress.Parse(address[0]), Convert.ToInt32(address[1])));
         }
 
         void ReceiveServers(ReadOnlyCollection<IPEndPoint> endPoints)
@@ -65,7 +65,7 @@ namespace Launcher
                 QueryServerAsync(server.GetEndpoint());
         }
 
-        async void QueryServerAsync(IPEndPoint endPoint)
+        async Task<ServerInfo> QueryServerAsync(IPEndPoint endPoint)
         {
             if (_currentNumberOfQueries > MAX_QUERIES)
             {
@@ -73,10 +73,10 @@ namespace Launcher
                 while (_currentNumberOfQueries > MAX_QUERIES) wait.SpinOnce();
             }
             Console.WriteLine("THREADS:" + _currentNumberOfQueries);
-            await Task.Run(() => { Interlocked.Increment(ref _currentNumberOfQueries); QueryServer(endPoint); });
+            return await Task.Run(() => { Interlocked.Increment(ref _currentNumberOfQueries); return QueryServer(endPoint); });
         }
 
-        void QueryServer(IPEndPoint endPoint)
+        ServerInfo QueryServer(IPEndPoint endPoint)
         {
             try
             {
@@ -87,10 +87,13 @@ namespace Launcher
 
                 var args = new ServerEventArgs { Handle = handle, Server = info };
                 OnServerAdded(args);
+
+                return info;
             }
             catch (Exception e)
             {
                 Debug.WriteLine(e.Message);
+                return null;
             }
             finally
             {
