@@ -56,7 +56,7 @@ namespace EpochLauncher
 		public void UI_RequestRefresh()
 		{
 			ServerInfo.MarkAllInvalid(10);
-			_browser.Refresh();
+		    _browser.Refresh();
 		}
 
 		public IEnumerable<IServerInfo> JS_RequestServers(int min, int max)
@@ -79,7 +79,8 @@ namespace EpochLauncher
 			_readyServers = new ConcurrentDictionary<string, ServerInfo>();
 			_dispatcher = mainDispatcher;
 
-			_browser.ServerAdded += BrowserOnServerChanged;
+
+			_browser.ServerChanged += BrowserOnServerChanged;
 
 			_browser.Refresh(true);
 		}
@@ -106,6 +107,12 @@ namespace EpochLauncher
 
 		public IServerInfo Find(string jsHandle)
 		{
+			if (jsHandle == null)
+				return null;
+
+			if (jsHandle == "")
+				return null;
+
 			ServerInfo info;
 			_readyServers.TryGetValue(jsHandle, out info);
 			return info;

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
-using Launcher;
 using Launcher.Events;
+using Timer = System.Timers.Timer;
 
 namespace Launcher.ConsoleTest
 {
@@ -13,8 +13,31 @@ namespace Launcher.ConsoleTest
         private static ServerBrowser browser;
         static void Main()
         {
+            //TestBrowser();
+            TestDownload();
+            while (true) ;
+        }
+
+        static void TestDownload()
+        {
+            var manager = new DownloadManager(@"D:\Games\SteamLibrary\SteamApps\common\Arma 3");
+            manager.Start();
+
+            var progressTimer = new Timer();
+            progressTimer.Elapsed += (s, e) => Console.WriteLine(manager.Manager.Progress);
+            progressTimer.Interval = 500;
+            progressTimer.Start();
+
+            var speedTimer = new Timer();
+            speedTimer.Elapsed += (s, e) => Console.WriteLine(manager.Manager.Engine.TotalDownloadSpeed);
+            speedTimer.Interval = 500;
+            speedTimer.Start();
+        }
+
+        static void TestBrowser()
+        {
             browser = new ServerBrowser();
-            browser.ServerAdded += OnServerAdded;
+            browser.ServerChanged += OnServerChanged;
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             browser.Refresh();
@@ -34,15 +57,9 @@ namespace Launcher.ConsoleTest
             }
         }
 
-        static void OnServerAdded(object sender, ServerEventArgs e)
-        {
-            Console.WriteLine("{0} ({1} players)", e.Server.Name, e.Server.Players);
-        }
-
         static void OnServerChanged(object sender, ServerEventArgs e)
         {
-
-
+            Console.WriteLine("{0} ({1} players)", e.Server.Name, e.Server.Players);
         }
     }
 }
