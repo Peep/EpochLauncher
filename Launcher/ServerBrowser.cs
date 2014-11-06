@@ -64,7 +64,7 @@ namespace Launcher
             {
                 var server = ServerQuery.GetServerInstance(EngineType.Source, endPoint);
                 var info = server.GetInfo();
-                var handle = String.Format("{0}:{1}", info.Address, info.Extra.Port);
+                var handle = String.Format("{0}:{1}", info.Address.Split(':')[0], info.Extra.Port);
                 var args = new ServerEventArgs { Handle = handle, Server = info };
 
                 OnServerChanged(args);

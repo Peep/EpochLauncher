@@ -26,7 +26,7 @@ namespace Launcher
 
         public void Start()
         {
-            var torrent = Torrent.Load(DownloadLatestTorrent("https://launcher.bmrf.me/Epoch-0.2.0.1.torrent"));
+            var torrent = Torrent.Load(DownloadTorrent("https://launcher.bmrf.me/Epoch-0.2.0.1.torrent"));
             Manager = new TorrentManager(torrent, _downloadPath, new TorrentSettings());
             Engine.Register(Manager);
 
@@ -41,7 +41,7 @@ namespace Launcher
             return DownloadState.Corrupted;
         }
 
-        private byte[] DownloadLatestTorrent(string uri)
+        private byte[] DownloadTorrent(string uri)
         {
             using (var wc = new WebClient())
                 return wc.DownloadData(uri);
