@@ -13,7 +13,7 @@ namespace Launcher
     public class ServerBrowser
     {
 	    public int ServerCount;
-        public event EventHandler<ServerEventArgs> ServerAdded;
+        public event EventHandler<ServerEventArgs> ServerChanged;
 
         public void Refresh(bool verifiedOnly = true)
         {
@@ -67,17 +67,17 @@ namespace Launcher
                 var handle = String.Format("{0}:{1}", info.Address, info.Extra.Port);
                 var args = new ServerEventArgs { Handle = handle, Server = info };
 
-                OnServerAdded(args);
+                OnServerChanged(args);
                 return info;
             } 
             catch {}
             return null;
         }
 
-        protected virtual void OnServerAdded(ServerEventArgs e)
+        protected virtual void OnServerChanged(ServerEventArgs e)
         {
 	        ServerCount++;
-            var handler = ServerAdded;
+            var handler = ServerChanged;
             if (handler != null)
                 handler(this, e);
         }
