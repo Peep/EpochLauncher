@@ -9,7 +9,10 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Threading;
 using CefSharp;
+using CefSharp.Wpf;
 using EpochLauncher.View;
 using Launcher;
 using Newtonsoft.Json;
@@ -19,6 +22,99 @@ namespace EpochLauncher.ViewModel
 {
 	public class LauncherViewModel
 	{
+
+		public interface IJavascriptInterface
+		{
+			Dispatcher Dispatcher { get; }
+
+			void Minimize();
+			void Maximize();
+			void Close();
+			string StartGame();
+			string ConnectTo(string ident);
+			string ManualConnectTo(string domain, int port);
+			string GetQuickLaunch();
+			void SetQuickLaunch(string ident);
+			string RequestServers(int min, int max);
+			string RequestServer(string ident);
+			void OpenSteamFileDialog();
+		}
+
+
+		public class ExportedJavascriptInterface
+			: IJavascriptInterface
+		{
+			private readonly IJavascriptInterface _internalInterface;
+			private readonly ChromiumWebBrowser _browser;
+
+
+			public Dispatcher Dispatcher
+			{
+				get { return _browser.Dispatcher; }
+			}
+
+			public void Minimize()
+			{
+				_internalInterface.Dispatcher.Invoke(_internalInterface.Minimize);
+			}
+
+			public void Maximize()
+			{
+				_internalInterface.Dispatcher.Invoke(_internalInterface.Maximize);
+			}
+
+			public void Close()
+			{
+				_internalInterface.Dispatcher.Invoke(_internalInterface.Close);
+			}
+
+			public string StartGame()
+			{
+				return _internalInterface.Dispatcher.Invoke(new Func<string>(_internalInterface.StartGame));
+			}
+
+			public string BeginConnectTo(string ident)
+			{
+				return _internalInterface.Dispatcher.Invoke(() => _internalInterface.ConnectTo(ident));
+			}
+
+			public void EndConnectTo()
+			{
+				_browser.ExecuteScriptAsync("");
+			}
+
+			public string ManualConnectTo(string domain, int port)
+			{
+				return _internalInterface.Dispatcher.Invoke(() => _internalInterface.ManualConnectTo(domain, port));
+			}
+
+			public string GetQuickLaunch()
+			{
+				throw new NotImplementedException();
+			}
+
+			public void SetQuickLaunch(string ident)
+			{
+				throw new NotImplementedException();
+			}
+
+			public string RequestServers(int min, int max)
+			{
+				throw new NotImplementedException();
+			}
+
+			public string RequestServer(string ident)
+			{
+				throw new NotImplementedException();
+			}
+
+			public void OpenSteamFileDialog()
+			{
+				throw new NotImplementedException();
+			}
+		}
+
+
 		private class JSAdapter
 		{
 			private const string ResultSuccess = @"{""result"":""success""}";
@@ -139,6 +235,11 @@ namespace EpochLauncher.ViewModel
 			public string RequestServer(string jsHandle)
 			{
 				return JsonConvert.SerializeObject(_serverStore.JS_RequestServer(jsHandle));
+			}
+
+			public void OpenSteamFileDialog()
+			{
+				_view.Dispatcher.InvokeAsync(_view.)
 			}
 		}
 
