@@ -77,6 +77,16 @@ namespace EpochLauncher.Model
 			}
 		}
 
+		public string RequestServers(int min, int max)
+		{
+			return "";
+		}
+
+		public string RequestServer(string jsHandle)
+		{
+			return "";
+		}
+
 		public string StartGame()
 		{
 			return string.Format(@"{{ ""result"" : ""{0}"" }}",

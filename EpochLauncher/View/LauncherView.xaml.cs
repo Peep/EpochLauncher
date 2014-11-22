@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 using CefSharp;
 using CefSharp.Wpf;
 using EpochLauncher.ViewModel;
@@ -23,6 +24,7 @@ namespace EpochLauncher.View
 	    private readonly LauncherViewModel _viewModel;
 	    private Point _lastPos;
 	    private Point _clickPos;
+	    private readonly DispatcherTimer _timer;
 
 	    public readonly ChromiumWebBrowser WebView;
 
@@ -73,8 +75,6 @@ namespace EpochLauncher.View
 		        WebView.ShowDevTools();
 	        }
 			_viewModel.Register(WebView);
-
-
         }
 
 

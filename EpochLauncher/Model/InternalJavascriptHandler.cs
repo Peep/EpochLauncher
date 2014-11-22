@@ -28,7 +28,6 @@ namespace EpochLauncher.Model
 		void MaximizeMessage();
 		void CloseMessage();
 
-
 		IServerInfo GetQuickLaunchMessage();
 		void SetQuickLaunchMessage(IServerInfo info);
 
